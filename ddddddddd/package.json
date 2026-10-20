@@ -1,0 +1,19 @@
+{
+  "name": "instituto-sarbelio-asistencia",
+  "version": "1.0.0",
+  "description": "Sistema de Gestión y Asistencia QR en Tiempo Real - Instituto Nacional Dr. Sarbelio Navarrete",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "asistencia",
+    "qr",
+    "instituto-sarbelio"
+  ],
+  "author": "Instituto Nacional Dr. Sarbelio Navarrete",
+  "license": "ISC"
+}

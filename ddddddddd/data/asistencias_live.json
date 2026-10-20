@@ -1,0 +1,36 @@
+[
+  {
+    "id": 2,
+    "token": "TEST-SALON-TARDY",
+    "nie": "9120482",
+    "estudiante": "Sofía Beatriz Rivas Morales",
+    "nombres": "Sofía Beatriz",
+    "apellidos": "Rivas Morales",
+    "grado": "Primer Año General \"A\"",
+    "materia": "Redes y Servidores",
+    "salon": "Laboratorio 2",
+    "docente": "Prof. Carlos Hernandez",
+    "fecha": "2026-10-16",
+    "hora": "09:05:38 a. m.",
+    "hora_marcaje": "09:05:38 a. m.",
+    "estado": "Tardanza",
+    "metodo_registro": "QR_Estudiante"
+  },
+  {
+    "id": 1,
+    "token": "TEST-SALON-AULA204",
+    "nie": "8492015",
+    "estudiante": "Carlos Eduardo Alvarado Gomez",
+    "nombres": "Carlos Eduardo",
+    "apellidos": "Alvarado Gomez",
+    "grado": "Primer Año ITSI \"A\"",
+    "materia": "Desarrollo de Software Web",
+    "salon": "Aula 204",
+    "docente": "Prof. Carlos Hernandez",
+    "fecha": "2026-10-16",
+    "hora": "09:05:38 a. m.",
+    "hora_marcaje": "09:05:38 a. m.",
+    "estado": "Presente",
+    "metodo_registro": "QR_Estudiante"
+  }
+]

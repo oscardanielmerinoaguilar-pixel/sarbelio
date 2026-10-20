@@ -1,0 +1,2904 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Gestión de Fichas de Estudiantes — Instituto Nacional Dr. Sarbelio Navarrete</title>
+
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Estilos Personalizados Institucionales -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Generador y Lector de Código QR con Cámara HTML5 (Local y CDN fallback) -->
+  <script src="js/qrcode.min.js"></script>
+  <script src="js/html5-qrcode.min.js"></script>
+  <script>
+    if (!window.QRCode) {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>');
+    }
+    if (!window.Html5Qrcode) {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"><\/script>');
+    }
+  </script>
+</head>
+
+<body>
+
+  <div id="app-container">
+
+    <!-- ====================================================================
+         1. NAVEGACIÓN LATERAL (SIDEBAR)
+         ==================================================================== -->
+    <aside class="sidebar no-print" id="main-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="logo-insavi.png" alt="Logo INSAVI">
+        </div>
+        <div class="sidebar-title">
+          <h2>INSTITUTO NACIONAL</h2>
+          <p>Dr. Sarbelio Navarrete</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Modo Visualización Interactiva</div>
+        <a href="#" class="nav-item active" data-target="view-dashboard">
+          <i class="fas fa-chart-line"></i> Dashboard Admin
+        </a>
+
+        <div class="nav-section-label">Gestión Estudiantil</div>
+        <a href="#" class="nav-item" data-target="view-estudiantes">
+          <i class="fas fa-user-graduate"></i> Todos los Estudiantes
+        </a>
+        <a href="#" class="nav-item" data-target="view-nuevo-estudiante" id="btn-navigate-new-student">
+          <i class="fas fa-user-plus"></i> Asistente de Matrícula
+        </a>
+        <a href="#" class="nav-item" data-target="view-docente-fichas-busqueda">
+          <i class="fas fa-search-plus" style="color: #38bdf8;"></i> Buscador de Fichas Estudiantiles
+        </a>
+
+        <div class="nav-section-label">Asistencia por Código QR (Docente)</div>
+        <a href="#" class="nav-item" data-target="view-maestros-gestion">
+          <i class="fas fa-chalkboard-teacher" style="color: #6366f1;"></i> Gestión de Maestros
+        </a>
+        <a href="#" class="nav-item" data-target="view-docente-portal">
+          <i class="fas fa-desktop" style="color: #3b82f6;"></i> Panel Docente & QR de Asistencia
+        </a>
+        <a href="#" class="nav-item" data-target="view-proyector-qr">
+          <i class="fas fa-qrcode" style="color: #22c55e;"></i> Proyector QR en Aula
+        </a>
+        <a href="#" class="nav-item" data-target="view-docente-historial">
+          <i class="fas fa-history" style="color: #f59e0b;"></i> Historial de Sesiones QR
+        </a>
+
+        <div class="nav-section-label">Portales Institucionales</div>
+        <a href="#" class="nav-item" data-target="view-estudiante-qr-asistencia">
+          <i class="fas fa-qrcode" style="color: #22c55e;"></i> Marcar Asistencia Estudiante (QR)
+        </a>
+        <a href="#" class="nav-item" data-target="view-estudiante-ficha">
+          <i class="fas fa-address-card"></i> Ficha de Matrícula (Estudiante)
+        </a>
+        <a href="#" class="nav-item" data-target="view-padre-portal">
+          <i class="fas fa-users-cog"></i> Portal Padre / Responsable
+        </a>
+
+        <div class="nav-section-label">Administración & Reportes</div>
+        <a href="#" class="nav-item" data-target="view-reportes">
+          <i class="fas fa-file-invoice"></i> Reportes Institucionales
+        </a>
+        <a href="#" class="nav-item" data-target="view-usuarios">
+          <i class="fas fa-user-shield"></i> Control de Usuarios
+        </a>
+        <a href="#" class="nav-item" data-target="view-configuracion">
+          <i class="fas fa-cog"></i> Configuración
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="current-user-avatar">A</div>
+          <div class="user-info">
+            <div class="user-name" id="current-user-name">Administrador Principal</div>
+            <div class="user-role" id="current-user-role">Modo Demostración</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         2. CONTENEDOR PRINCIPAL Y BARRA SUPERIOR CON ROLES INTERACTIVOS
+         ==================================================================== -->
+    <div class="main-wrapper">
+
+      <!-- Topbar Header con Roles -->
+      <header class="topbar no-print">
+        <div class="topbar-left">
+          <button class="btn-sidebar-toggle" title="Alternar menú lateral"><i class="fas fa-bars"></i></button>
+          <div class="topbar-titles-group">
+            <h1 class="topbar-page-title" id="topbar-title">Dashboard Principal</h1>
+            <span class="badge badge-primary" id="role-badge"><i class="fas fa-shield-alt"></i> Modo
+              Administrador</span>
+          </div>
+        </div>
+
+        <!-- BARRA SUPERIOR DE SELECTOR DE ROLES / SECCIONES PRINCIPALES (AESTHETIC PILLS) -->
+        <nav class="role-selector-bar" aria-label="Selector de roles">
+          <button class="role-tab active" data-role="admin" data-target="view-dashboard"
+            title="Sección Administración y Matrícula General">
+            <i class="fas fa-shield-alt"></i> <span>Admin</span>
+          </button>
+          <button class="role-tab" data-role="docente" data-target="view-docente-portal"
+            title="Sección Docente y Monitor QR">
+            <i class="fas fa-chalkboard-teacher"></i> <span>Docente</span>
+          </button>
+          <button class="role-tab" data-role="estudiante" data-target="view-estudiante-qr-asistencia"
+            title="Sección Estudiante y Marcaje de Asistencia QR">
+            <i class="fas fa-qrcode"></i> <span>Estudiante</span>
+          </button>
+          <button class="role-tab" data-role="padre" data-target="view-padre-portal"
+            title="Sección Familiar y Justificaciones">
+            <i class="fas fa-users"></i> <span>Familia</span>
+          </button>
+        </nav>
+
+        <div class="topbar-right">
+          <button class="btn-topbar-action btn-excel" onclick="sarbelioApp.exportFullDatabaseExcel()"
+            title="Descargar toda la Base de Datos completa en documento de Excel (.xls)">
+            <i class="fas fa-file-excel"></i> <span>Exportar BD</span>
+          </button>
+          <div id="teacher-auth-status" class="teacher-auth-container"></div>
+          <div class="school-year-pill" title="Año Lectivo 2026">
+            <i class="fas fa-calendar-check"></i> <span>2026</span>
+          </div>
+          <button class="btn-topbar-action btn-reset" onclick="sarbelioApp.resetDemoData();"
+            title="Reiniciar datos de demostración">
+            <i class="fas fa-sync-alt"></i> <span>Reiniciar</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Body -->
+      <main class="content-body">
+
+        <!-- ================================================================
+             VISTA 1: DASHBOARD PRINCIPAL (ADMIN)
+             ================================================================ -->
+        <section id="view-dashboard" class="view-panel active">
+
+
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon blue"><i class="fas fa-user-graduate"></i></div>
+              <div class="stat-info">
+                <h3 id="stat-total-estudiantes">4</h3>
+                <p>Total Estudiantes</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon green"><i class="fas fa-user-check"></i></div>
+              <div class="stat-info">
+                <h3 id="stat-estudiantes-activos">4</h3>
+                <p>Estudiantes Activos</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+              <div class="stat-info">
+                <h3 id="stat-in-ausencias">3</h3>
+                <p>Inasistencias Reportadas</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon amber"><i class="fas fa-users"></i></div>
+              <div class="stat-info">
+                <h3 id="stat-padres-registrados">2</h3>
+                <p>Padres Responsables</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Distribución Académica y Historial -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top:20px;">
+            <div class="filter-card">
+              <h3 style="font-size: 15px; margin-bottom: 16px; color: var(--secondary);"><i class="fas fa-chart-bar"
+                  style="color:var(--primary);"></i> Distribución por Bachillerato</h3>
+              <div id="dashboard-grade-bars">
+                <div style="margin-bottom:12px;">
+                  <div
+                    style="display:flex; justify-content:space-between; font-weight:600; font-size:12px; margin-bottom:4px;">
+                    <span>ITSI (Desarrollo de Software)</span>
+                    <span>2 Alumnos</span>
+                  </div>
+                  <div style="background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden;">
+                    <div style="background:var(--primary); width:50%; height:100%;"></div>
+                  </div>
+                </div>
+                <div style="margin-bottom:12px;">
+                  <div
+                    style="display:flex; justify-content:space-between; font-weight:600; font-size:12px; margin-bottom:4px;">
+                    <span>Bachillerato General</span>
+                    <span>1 Alumno</span>
+                  </div>
+                  <div style="background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden;">
+                    <div style="background:var(--accent); width:25%; height:100%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style="display:flex; justify-content:space-between; font-weight:600; font-size:12px; margin-bottom:4px;">
+                    <span>Bachillerato Administrativo Contable</span>
+                    <span>1 Alumno</span>
+                  </div>
+                  <div style="background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden;">
+                    <div style="background:var(--success); width:25%; height:100%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="filter-card">
+              <h3 style="font-size: 15px; margin-bottom: 16px; color: var(--secondary);"><i class="fas fa-history"
+                  style="color:var(--primary);"></i> Actividad Reciente del Sistema</h3>
+              <div class="table-responsive">
+                <table class="custom-table" style="font-size: 12px;">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Usuario</th>
+                      <th>Acción</th>
+                      <th>Descripción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="audit-table-body">
+                    <tr>
+                      <td>2026-03-09</td>
+                      <td>Roberto Alvarado</td>
+                      <td>Justificación Padre</td>
+                      <td>Solicitud de inasistencia enviada por el padre de familia</td>
+                    </tr>
+                    <tr>
+                      <td>2026-03-08</td>
+                      <td>Prof. Carlos Hernandez</td>
+                      <td>Pase de Lista</td>
+                      <td>Falta registrada para Carlos Alvarado</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ================================================================
+             VISTA 2: LISTADO COMPLETO DE ESTUDIANTES (ADMIN)
+             ================================================================ -->
+        <section id="view-estudiantes" class="view-panel">
+          <div class="filter-card">
+            <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--secondary);"><i
+                class="fas fa-filter"></i> Búsqueda y Filtros de Matrícula</h3>
+
+            <div class="filter-grid">
+              <div>
+                <label class="form-label">Buscar por NIE, Expediente o Nombre</label>
+                <input type="text" id="filter-search" class="form-control" placeholder="Ej: 8492015, Alvarado...">
+              </div>
+
+              <div>
+                <label class="form-label">Bachillerato</label>
+                <select id="filter-bachillerato" class="form-select">
+                  <option value="">Todos los Bachilleratos</option>
+                  <option value="General">General</option>
+                  <option value="Administrativo Contable">Administrativo Contable</option>
+                  <option value="ITSI">Infraestructura Tecnologica y Servicios Informaticos</option>
+                  <option value="Turismo">Turismo</option>
+                  <option value="Salud">Salud</option>
+                  <option value="Automotriz">Automotriz</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label">Año</label>
+                <select id="filter-anio" class="form-select">
+                  <option value="">Todos los Años</option>
+                  <option value="Primer Año">Primer Año</option>
+                  <option value="Segundo Año">Segundo Año</option>
+                  <option value="Tercer Año">Tercer Año</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label">Estado</label>
+                <select id="filter-estado" class="form-select">
+                  <option value="">Todos los Estados</option>
+                  <option value="Activo">Activo</option>
+                  <option value="Retirado">Retirado</option>
+                </select>
+              </div>
+            </div>
+
+            <div
+              style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <!-- Botones Estéticos de Filtro por Sección -->
+              <div class="filter-secciones-bar" style="margin-top: 0; padding-top: 0; border-top: none;">
+                <span
+                  style="font-size: 12px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 6px;">
+                  <i class="fas fa-layer-group"></i> Secciones:
+                </span>
+                <button type="button" class="btn-filter-sec-pill active"
+                  onclick="sarbelioApp.filterBySeccionQuick('', this)">Todas</button>
+                <button type="button" class="btn-filter-sec-pill"
+                  onclick="sarbelioApp.filterBySeccionQuick('A', this)">🅰️ Sección A</button>
+                <button type="button" class="btn-filter-sec-pill"
+                  onclick="sarbelioApp.filterBySeccionQuick('B', this)">🅱️ Sección B</button>
+                <button type="button" class="btn-filter-sec-pill"
+                  onclick="sarbelioApp.filterBySeccionQuick('C', this)">🅲 Sección C</button>
+                <button type="button" class="btn-filter-sec-pill"
+                  onclick="sarbelioApp.filterBySeccionQuick('D', this)">🅳 Sección D</button>
+                <button type="button" class="btn-filter-sec-pill"
+                  onclick="sarbelioApp.filterBySeccionQuick('E', this)">🅴 Sección E</button>
+              </div>
+
+              <button class="btn btn-secondary btn-sm" id="btn-reset-filters"><i class="fas fa-undo"></i> Limpiar
+                Filtros</button>
+            </div>
+          </div>
+
+          <!-- Tabla de Estudiantes -->
+          <div class="table-card">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>NIE</th>
+                    <th>Expediente</th>
+                    <th>Nombre Completo</th>
+                    <th>Bachillerato</th>
+                    <th>Año</th>
+                    <th>Sección</th>
+                    <th>Orientador</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="students-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA: MARCAJE DE ASISTENCIA POR NIE (ESTUDIANTE)
+             ================================================================ -->
+        <section id="view-estudiante-qr-asistencia" class="view-panel">
+
+          <!-- Banner Superior Institucional -->
+          <div class="teacher-header-banner"
+            style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 18px; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(15,23,42,0.15);">
+            <div>
+              <h2><i class="fas fa-clipboard-check" style="color: #22c55e;"></i> Registro de Asistencia Estudiantil</h2>
+              <p id="student-attendance-banner-desc">Ingrese su número de NIE para confirmar su asistencia a la clase
+                proyectada en el aula.</p>
+            </div>
+            <div>
+              <span class="live-indicator"><span class="live-dot"></span> Sistema de Marcaje Activo</span>
+            </div>
+          </div>
+
+          <!-- CONTENEDOR CENTRAL: APARTADO EXCLUSIVO PARA INGRESAR NIE Y REGISTRARSE -->
+          <div style="max-width: 580px; margin: 0 auto 30px auto;">
+            <div class="filter-card"
+              style="padding: 32px; border-radius: 20px; box-shadow: 0 12px 35px rgba(0,0,0,0.08); border-top: 5px solid #22c55e; background: #ffffff;">
+
+              <!-- Info de la Clase y Docente Proyectando -->
+              <div id="student-session-badge"
+                style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px;">
+                <div
+                  style="width: 46px; height: 46px; border-radius: 12px; background: #22c55e; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(34,197,94,0.3);">
+                  <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div style="flex: 1;">
+                  <div
+                    style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #64748b; letter-spacing: 0.5px;">
+                    Clase Proyectada en Aula</div>
+                  <div id="student-session-teacher"
+                    style="font-size: 15px; font-weight: 800; color: #0f172a; margin-top: 2px;">Prof. Carlos Hernández —
+                    Desarrollo de Software</div>
+                  <div id="student-session-date" style="font-size: 12px; color: #64748b; margin-top: 1px;">Instituto
+                    Nacional Dr. Sarbelio Navarrete (INSAVI)</div>
+                </div>
+              </div>
+
+              <!-- TARJETA DE VERIFICACIÓN DE GEOLOCALIZACIÓN INSTITUCIONAL OBLIGATORIA -->
+              <div id="student-geo-card"
+                style="border-radius: 14px; padding: 16px 18px; margin-bottom: 20px; border: 2px solid #cbd5e1; background: #f8fafc; transition: all 0.3s ease;">
+                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                  <div id="student-geo-icon-container"
+                    style="width: 44px; height: 44px; border-radius: 12px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(67,56,202,0.15);">
+                    <i class="fas fa-map-marked-alt" id="student-geo-icon"></i>
+                  </div>
+                  <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                      <span id="student-geo-badge-tag" style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #4338ca;">
+                        📍 Geolocalización Institucional Obligatoria
+                      </span>
+                      <span id="student-geo-status-badge" class="badge badge-info" style="font-size: 11px; font-weight: 800; padding: 4px 10px;">
+                        Ubicación Pendiente
+                      </span>
+                    </div>
+                    <div id="student-geo-target-title" style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 4px;">
+                      Instituto Nacional Dr. Sarbelio Navarrete
+                    </div>
+                    <div id="student-geo-target-address" style="font-size: 12px; color: #475569; margin-top: 2px;">
+                      <i class="fas fa-location-dot" style="color: #6366f1;"></i> 6ª Calle Poniente y 9ª Avenida Sur, San Vicente
+                    </div>
+                    <div id="student-geo-message" style="font-size: 12px; color: #64748b; margin-top: 8px; line-height: 1.45;">
+                      Para registrar su asistencia (mediante <strong>código QR</strong>, <strong>enlace directo</strong> o <strong>ID de sesión</strong>), su dispositivo debe activar el GPS para validar que se encuentra dentro de las instalaciones del instituto (máx. 250m).
+                    </div>
+                    <div id="student-geo-actions" style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                      <button type="button" id="btn-request-location" class="btn btn-primary btn-sm" onclick="sarbelioApp.solicitarUbicacionEstudiante(true)"
+                        style="font-weight: 800; font-size: 12px; padding: 7px 16px; border-radius: 8px; box-shadow: 0 2px 6px rgba(59,130,246,0.3);">
+                        <i class="fas fa-location-arrow"></i> Activar y Validar Ubicación GPS
+                      </button>
+                      <div style="display: inline-flex; gap: 4px; margin-left: auto;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="sarbelioApp.simularUbicacionINSAVI(true)"
+                          style="font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 700; color: #16a34a; border-color: #86efac; background: #f0fdf4;" title="Simular estar dentro de INSAVI (6ª Calle Poniente)">
+                          <i class="fas fa-check"></i> Probar en INSAVI
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="sarbelioApp.simularUbicacionINSAVI(false)"
+                          style="font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 700; color: #dc2626; border-color: #fca5a5; background: #fef2f2;" title="Simular estar fuera de INSAVI">
+                          <i class="fas fa-ban"></i> Probar Fuera
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Campo de ID de Sesión / Código QR (Por si el QR no funciona o ingreso manual) -->
+              <div style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 14px; padding: 14px 16px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                  <label for="qr-student-session-id" style="font-size: 13px; font-weight: 800; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-key" style="color: #4f46e5;"></i> ID de Sesión / Clase:
+                  </label>
+                  <span class="badge badge-info" style="font-size: 10px; font-weight: 700; background: #e0e7ff; color: #3730a3;">
+                    <i class="fas fa-life-ring"></i> Por si el QR no funciona
+                  </span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="qr-student-session-id" class="form-control"
+                    placeholder="Ej: DOC-QR-1-2026" autocomplete="off"
+                    style="font-family: monospace; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; background: #ffffff; border: 2px solid #cbd5e1;"
+                    oninput="sarbelioApp.onManualSessionIdChange(this.value)">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="sarbelioApp.aplicarSessionIdManual()"
+                    style="font-weight: 700; white-space: nowrap; background: #ffffff;" title="Verificar y vincular ID">
+                    <i class="fas fa-check"></i> Validar ID
+                  </button>
+                </div>
+                <div id="qr-session-id-feedback" style="margin-top: 6px; font-size: 11px;"></div>
+                <small style="display: block; margin-top: 4px; color: #64748b; font-size: 11px;">
+                  💡 <em>Si su cámara o el código QR no funcionó, verifique que este ID coincida con el que aparece abajo del código QR proyectado.</em>
+                </small>
+              </div>
+
+              <!-- Formulario de ingreso de NIE -->
+              <div style="margin-bottom: 22px;">
+                <label for="qr-student-nie-input"
+                  style="display: block; font-size: 15px; font-weight: 800; color: #1e293b; margin-bottom: 10px;">
+                  <i class="fas fa-id-card" style="color: #22c55e;"></i> Número de Identificación de Estudiante (NIE):
+                </label>
+                <div style="position: relative;">
+                  <input type="text" id="qr-student-nie-input" class="form-control" placeholder="Ej: 8492015"
+                    inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+                    style="font-size: 24px; font-weight: 800; text-align: center; letter-spacing: 3px; padding: 16px; border: 2px solid #cbd5e1; border-radius: 14px; color: #0f172a; background: #ffffff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.04); transition: border-color 0.2s, box-shadow 0.2s;"
+                    onkeydown="if(event.key === 'Enter'){ sarbelioApp.marcarAsistenciaEstudianteQR(); }">
+                </div>
+                <small style="display: block; margin-top: 8px; color: #64748b; font-size: 12px; text-align: center;">
+                  Digite su número de NIE y presione el botón para registrar su presencia.
+                </small>
+              </div>
+
+              <!-- Botón Principal de Registro -->
+              <button type="button" id="btn-marcar-asistencia" class="btn btn-success w-100"
+                onclick="sarbelioApp.marcarAsistenciaEstudianteQR()"
+                style="font-weight: 800; font-size: 16px; padding: 16px; border-radius: 14px; background: #22c55e; border: none; box-shadow: 0 4px 16px rgba(34,197,94,0.35); cursor: pointer; transition: transform 0.1s, background-color 0.2s;">
+                <i class="fas fa-check-circle"></i> REGISTRAR MI ASISTENCIA
+              </button>
+
+              <!-- Tarjeta de Confirmación / Estado del Marcaje -->
+              <div id="qr-today-status-card"
+                style="margin-top: 22px; border-radius: 14px; padding: 18px; text-align: center; background: #f8fafc; border: 1px dashed #cbd5e1; transition: all 0.3s ease;">
+                <i class="fas fa-info-circle"
+                  style="font-size: 32px; color: #64748b; margin-bottom: 8px; display: block;"></i>
+                <h4 style="font-size: 15px; font-weight: 700; color: #334155; margin: 0 0 4px 0;">Esperando Ingreso de
+                  NIE</h4>
+                <p style="font-size: 13px; color: #64748b; margin: 0;" id="qr-status-message">
+                  Ingrese su NIE en la casilla superior y presione "Registrar mi Asistencia".
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- TABLA HISTORIAL DE REGISTROS DE ASISTENCIA RECIENTES -->
+          <div class="filter-card">
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
+              <i class="fas fa-history"></i> Registros Recientes de Asistencia
+            </h3>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Fecha / Hora</th>
+                    <th>NIE Alumno</th>
+                    <th>Estudiante</th>
+                    <th>Bachillerato & Sección</th>
+                    <th>Método</th>
+                    <th>Estado Asistencia</th>
+                  </tr>
+                </thead>
+                <tbody id="student-qr-history-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA 3: MÓDULO DEL DOCENTE — MONITOR DE ASISTENCIA QR EN VIVO
+             ================================================================ -->
+        <!-- ================================================================
+             VISTA 3: MÓDULO DEL DOCENTE — MONITOR DE ASISTENCIA QR EN VIVO
+             ================================================================ -->
+        <section id="view-docente-portal" class="view-panel">
+
+          <!-- BANNER FLOTANTE DE NOTIFICACIÓN DE JUSTIFICACIONES PARA EL MAESTRO -->
+          <div id="teacher-notification-banner" class="alert alert-warning"
+            style="display:none; margin-bottom:20px; border-left:6px solid #f59e0b; background:#fffbeb; padding:15px; border-radius:10px; box-shadow:0 4px 12px rgba(245,158,11,0.15);">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div
+                style="background:#fef3c7; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <i class="fas fa-bell" style="font-size:22px; color:#d97706;"></i>
+              </div>
+              <div style="flex:1;">
+                <h4 style="font-size:15px; font-weight:800; color:#92400e; margin:0 0 2px 0;">🔔 NOTIFICACIÓN EN TIEMPO
+                  REAL: ¡NUEVA JUSTIFICACIÓN DE PADRE!</h4>
+                <p style="font-size:13px; color:#78350f; margin:0;" id="teacher-notif-text">Se han recibido solicitudes
+                  de justificación enviadas por los padres de familia.</p>
+              </div>
+              <button class="btn btn-warning btn-sm"
+                onclick="document.getElementById('docente-justificaciones-card').scrollIntoView({behavior:'smooth'})">
+                <i class="fas fa-envelope-open-text"></i> Revisar Justificaciones Pendientes
+              </button>
+            </div>
+          </div>
+
+          <div class="teacher-header-banner">
+            <div>
+              <h2><i class="fas fa-chalkboard-teacher"></i> Monitor de Asistencia QR & Control Orientador (Docente)</h2>
+              <p>Los estudiantes registran su asistencia de forma autónoma escaneando el código QR. El maestro monitorea
+                en tiempo real y gestiona las solicitudes de justificación enviadas por los padres.</p>
+            </div>
+            <div>
+              <span class="live-indicator"><span class="live-dot"></span> Monitor en Vivo Activo</span>
+            </div>
+          </div>
+
+          <!-- PANEL PRINCIPAL: CÓDIGO QR DE ASISTENCIA DINÁMICO POR SALÓN (DOCENTE) -->
+          <div class="filter-card"
+            style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #ffffff; margin-bottom: 25px; border-radius: 18px; box-shadow: 0 10px 30px rgba(30, 27, 75, 0.35);">
+
+            <!-- Barra superior: Información del Maestro y Selector de Docente -->
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 16px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                  <span class="badge"
+                    style="background: #4f46e5; color: #ffffff; font-weight: 700; font-size: 11px; text-transform: uppercase;">Docente
+                    Titular</span>
+                  <span class="badge" style="background: #10b981; color: #ffffff; font-weight: 700; font-size: 11px;"><i
+                      class="fas fa-check-circle"></i> Sistema de Asistencia en Aula</span>
+                </div>
+                <h3 style="font-size: 22px; font-weight: 800; color: #ffffff; margin: 0;" id="teacher-profile-name">
+                  Prof. Carlos Hernandez
+                </h3>
+                <div
+                  style="font-size: 13px; color: #c7d2fe; margin-top: 4px; display: flex; gap: 15px; flex-wrap: wrap;">
+                  <span id="teacher-profile-code"><i class="fas fa-id-badge"></i> DOC-2026-001</span>
+                  <span id="teacher-profile-materia"><i class="fas fa-book"></i> Informática y Robótica</span>
+                </div>
+              </div>
+
+              <!-- Selector rápido para cambiar entre maestros registrados -->
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                <label
+                  style="font-size: 11px; color: #c7d2fe; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <i class="fas fa-user-friends"></i> Docente en Pantalla:
+                </label>
+                <select id="docente-selector-qr" class="form-select"
+                  style="min-width: 260px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.12); color: #ffffff; border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 7px 12px;"
+                  onchange="sarbelioApp.cambiarDocenteActivoQR(this.value)">
+                </select>
+              </div>
+            </div>
+
+            <!-- CONTROL DE SALÓN / AULA Y VENTANA DE ASISTENCIA PUNTUAL / TARDANZA -->
+            <div style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18); border-radius: 14px; padding: 18px; margin-bottom: 22px;">
+              <div style="font-size: 13px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-door-open"></i> Llegada al Salón de Clases & Control Horario de Asistencia
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; align-items: flex-end;">
+                <!-- 1. Salón / Aula al que llegó el docente -->
+                <div>
+                  <label style="font-size: 12px; font-weight: 700; color: #e0e7ff; margin-bottom: 6px; display: block;">
+                    <i class="fas fa-chalkboard"></i> Salón / Aula Actual:
+                  </label>
+                  <select id="docente-salon-select" class="form-select"
+                    style="font-size: 13px; font-weight: 600; background: #0f172a; color: #ffffff; border: 1px solid #6366f1; border-radius: 8px;"
+                    onchange="sarbelioApp.onTeacherSalonSelected(this.value)">
+                    <!-- Opciones dinámicas cargadas por JavaScript -->
+                  </select>
+                </div>
+
+                <!-- 2. Hora de Habilitación del QR -->
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="font-size: 12px; font-weight: 700; color: #e0e7ff; margin: 0;">
+                      <i class="fas fa-clock"></i> Hora de Habilitación:
+                    </label>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="sarbelioApp.setQRStartTimeNow()"
+                      style="font-size: 10px; padding: 2px 8px; color: #38bdf8; border-color: rgba(56,189,248,0.4);">
+                      Hora Actual
+                    </button>
+                  </div>
+                  <input type="time" id="qr-session-start-time" class="form-control"
+                    style="font-size: 13px; font-weight: 700; background: #0f172a; color: #ffffff; border: 1px solid #6366f1; border-radius: 8px;">
+                </div>
+
+                <!-- 3. Tiempo Límite para Asistencia Puntual -->
+                <div>
+                  <label style="font-size: 12px; font-weight: 700; color: #e0e7ff; margin-bottom: 6px; display: block;">
+                    <i class="fas fa-stopwatch"></i> Tiempo Puntual (Minutos):
+                  </label>
+                  <select id="qr-session-grace-minutes" class="form-select"
+                    style="font-size: 13px; font-weight: 600; background: #0f172a; color: #ffffff; border: 1px solid #6366f1; border-radius: 8px;">
+                    <option value="5">5 minutos (Tolerancia corta)</option>
+                    <option value="10" selected>10 minutos (Recomendado)</option>
+                    <option value="15">15 minutos (Tolerancia media)</option>
+                    <option value="20">20 minutos</option>
+                    <option value="30">30 minutos</option>
+                    <option value="45">45 minutos (Bloque completo)</option>
+                  </select>
+                </div>
+
+                <!-- 4. Botón Aplicar / Actualizar QR para este Salón -->
+                <div>
+                  <button class="btn btn-primary" id="btn-activar-salon-qr" onclick="sarbelioApp.iniciarSesionSalonQR()"
+                    style="width: 100%; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); font-weight: 800; border: none; padding: 9px 14px; font-size: 13px; box-shadow: 0 4px 12px rgba(37,99,235,0.4); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fas fa-sync-alt"></i> <span>Actualizar QR de Salón</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Indicador de Estado del Salón y Modo Puntual/Tardanza -->
+              <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div style="font-size: 13px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                  <span style="color: #cbd5e1;">Salón Activo:</span>
+                  <span class="badge" id="badge-active-salon" style="background: #0284c7; color: #ffffff; font-weight: 700; font-size: 12px;">
+                    <i class="fas fa-door-open"></i> Laboratorio de Cómputo 1
+                  </span>
+                  <span class="badge" id="badge-active-clase" style="background: #4338ca; color: #ffffff; font-weight: 700; font-size: 12px;">
+                    1° ITSI "A" — Desarrollo de Software Web
+                  </span>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span id="badge-session-mode" class="badge" style="background: #16a34a; color: #ffffff; font-weight: 800; font-size: 12px; padding: 6px 14px; animation: pulse 2s infinite;">
+                    <i class="fas fa-check-circle"></i> PERIODO PUNTUAL (Marcando como Presente)
+                  </span>
+                  <span id="session-countdown-display" style="font-family: monospace; font-size: 15px; font-weight: 800; color: #38bdf8; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15);">
+                    10:00 restantes
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 25px;">
+              <div style="max-width: 580px; flex: 1;">
+                <h4 style="font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 8px;">
+                  <i class="fas fa-qrcode" style="color: #38bdf8;"></i> Código QR Exclusivo para este Salón de Clases
+                </h4>
+                <p style="font-size: 13px; color: #c7d2fe; margin-bottom: 18px; line-height: 1.5;">
+                  Cada vez que llegue a un salón, el código QR se actualiza para la materia y sección correspondiente. Proyéctelo a los alumnos para que marquen asistencia. Al concluir la hora límite fijada, el sistema registrará automáticamente las lecturas posteriores como <strong>Tardanza</strong>.
+                </p>
+
+                <!-- Acciones Principales para el Docente -->
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                  <button class="btn btn-primary" onclick="sarbelioApp.abrirProyectorDocente()"
+                    style="background: #3b82f6; border: none; font-weight: 700; padding: 10px 18px; font-size: 13px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);">
+                    <i class="fas fa-expand"></i> 📺 Proyectar en Aula (Pantalla Completa)
+                  </button>
+                  <button class="btn btn-success" onclick="sarbelioApp.exportTeacherSessionAttendanceExcel()"
+                    style="background: #10b981; border: none; font-weight: 800; padding: 10px 18px; font-size: 13px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); display: inline-flex; align-items: center; gap: 6px;"
+                    title="Descargar la lista completa de asistencias de esta sesión en formato Excel">
+                    <i class="fas fa-file-excel"></i> 📥 Descargar Asistencias en Excel (.xls)
+                  </button>
+                  <button class="btn btn-outline" onclick="sarbelioApp.copiarEnlaceAsistenciaDocente()"
+                    style="color: #ffffff; border-color: rgba(255,255,255,0.3); font-size: 13px;">
+                    <i class="fas fa-copy"></i> Copiar Enlace
+                  </button>
+                  <button class="btn btn-outline" onclick="sarbelioApp.imprimirQRDocente()"
+                    style="color: #ffffff; border-color: rgba(255,255,255,0.3); font-size: 13px;">
+                    <i class="fas fa-print"></i> Imprimir QR
+                  </button>
+                  <button class="btn btn-outline" onclick="sarbelioApp.regenerarQRDocente()"
+                    style="color: #cbd5e1; border-color: rgba(255,255,255,0.2); font-size: 12px;"
+                    title="Generar un nuevo token de seguridad">
+                    <i class="fas fa-sync-alt"></i> Renovar Código
+                  </button>
+                </div>
+
+                <!-- Contadores de Alumnos -->
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                  <div
+                    style="background: rgba(255,255,255,0.1); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15);">
+                    <div style="font-size: 11px; color: #a5b4fc; text-transform: uppercase; font-weight: 700;">Asistencias
+                      Puntuales</div>
+                    <div style="font-size: 24px; font-weight: 800; color: #38bdf8;" id="teacher-qr-count-present">0
+                      Alumnos</div>
+                  </div>
+                  <div
+                    style="background: rgba(255,255,255,0.1); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15);">
+                    <div style="font-size: 11px; color: #a5b4fc; text-transform: uppercase; font-weight: 700;">Tardanzas
+                      Registradas</div>
+                    <div style="font-size: 24px; font-weight: 800; color: #fbbf24;" id="teacher-qr-count-tardy">0
+                      Alumnos</div>
+                  </div>
+                  <div
+                    style="background: rgba(255,255,255,0.1); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15);">
+                    <div style="font-size: 11px; color: #a5b4fc; text-transform: uppercase; font-weight: 700;">Total Registrados</div>
+                    <div style="font-size: 24px; font-weight: 800; color: #4ade80;" id="teacher-qr-count-total">0
+                      Alumnos</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Render del Código QR Oficial del Maestro y Salón -->
+              <div
+                style="background: #ffffff; padding: 18px; border-radius: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.4); text-align: center; min-width: 220px; max-width: 250px;">
+                <div id="class-daily-qr-container"
+                  style="display: flex; justify-content: center; align-items: center; width: 160px; height: 160px; margin: 0 auto;">
+                </div>
+                <div
+                  style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin-top: 10px; letter-spacing: 0.5px;" id="teacher-qr-badge-title">
+                  QR DE SALÓN ACTIVO
+                </div>
+                <div style="font-size: 10px; color: #64748b; font-family: monospace; margin-top: 2px;"
+                  id="teacher-official-token-badge">
+                  DOC-QR-001
+                </div>
+
+                <!-- ENLACE Y ID ABAJO DEL QR -->
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e2e8f0; text-align: center;">
+                  <div style="font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
+                    <i class="fas fa-key" style="color: #4f46e5;"></i> ID si QR no funciona:
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 6px;">
+                    <span id="teacher-official-token-display"
+                      style="font-family: monospace; font-size: 12px; font-weight: 900; background: #e0e7ff; color: #3730a3; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px;">
+                      DOC-QR-001
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline" style="padding: 2px 7px; font-size: 10px;"
+                      onclick="sarbelioApp.copyTeacherSessionId()" title="Copiar ID de Sesión">
+                      <i class="fas fa-copy"></i>
+                    </button>
+                  </div>
+
+                  <div style="margin-top: 6px;">
+                    <a id="teacher-daily-qr-link" href="#" target="_blank"
+                      style="font-size: 11px; font-weight: 700; color: #2563eb; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;"
+                      title="Abrir enlace directo de asistencia">
+                      <i class="fas fa-external-link-alt"></i> Enlace directo abajo del QR
+                    </a>
+                  </div>
+                  <div style="font-size: 10px; color: #94a3b8; margin-top: 4px; line-height: 1.2;">
+                    Compartir enlace o ID si falla el escáner
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TABLA DE MONITOREO DE ASISTENCIAS EN TIEMPO REAL -->
+          <div class="filter-card" style="margin-bottom: 25px;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--primary); margin: 0;">
+                  <i class="fas fa-stream"></i> Registro de Asistencias del Salón (Tiempo Real)
+                </h3>
+                <small style="color: var(--text-muted); font-size: 12px;">Marcadas por los estudiantes con su NIE en este salón de clases.</small>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button class="btn btn-success btn-sm" onclick="sarbelioApp.exportTeacherSessionAttendanceExcel()"
+                  style="font-weight: 800; display: inline-flex; align-items: center; gap: 6px; background: #16a34a; border-color: #15803d; color: #ffffff;"
+                  title="Descargar tabla en formato Excel (.xls)">
+                  <i class="fas fa-file-excel"></i> <span>Descargar Excel</span>
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="sarbelioApp.openDocenteCameraScanner()"
+                  style="font-weight: 700;">
+                  <i class="fas fa-camera"></i> Escanear Carnet con Cámara
+                </button>
+                <button class="btn btn-outline btn-sm" id="btn-refresh-teacher-monitor"
+                  onclick="sarbelioApp.renderTeacherQRMonitor(true)"
+                  style="font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <i class="fas fa-sync-alt" id="icon-refresh-teacher-monitor"></i> <span>Actualizar Monitor</span>
+                </button>
+                <span id="monitor-refresh-feedback"
+                  style="display: none; font-size: 12px; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 5px 12px; border-radius: 8px; border: 1px solid #bbf7d0; animation: fadeIn 0.2s ease;">
+                  <i class="fas fa-check-circle"></i> ¡Monitor Actualizado!
+                </span>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Hora de Marcaje</th>
+                    <th>NIE Alumno</th>
+                    <th>Estudiante</th>
+                    <th>Bachillerato y Sección</th>
+                    <th>Salón / Aula</th>
+                    <th>Método de Marcaje</th>
+                    <th>Estado Registrado</th>
+                  </tr>
+                </thead>
+                <tbody id="teacher-qr-monitor-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- BANDEJA DE SOLICITUDES DE JUSTIFICACIÓN DE PADRES (SOLO DEL MAESTRO ASESOR) -->
+          <div class="filter-card" id="docente-justificaciones-card"
+            style="margin-top: 25px; border-left: 5px solid var(--warning);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--primary); margin: 0;" id="docente-justificaciones-title">
+                  <i class="fas fa-envelope-open-text" style="color: var(--warning);"></i> Solicitudes de Justificación de Padres de Familia (Mis Estudiantes Asesorados)
+                </h3>
+                <small style="color: var(--text-muted); font-size: 12px; display: block; margin-top: 4px;">
+                  <i class="fas fa-shield-alt"></i> Filtrado institucional: Aquí se muestran únicamente las solicitudes de los alumnos donde usted es el <strong>Docente Asesor / Orientador</strong> titular.
+                </small>
+              </div>
+              <div>
+                <span class="badge badge-warning" id="docente-justificaciones-badge">0 Pendientes</span>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Fecha Inasistencia</th>
+                    <th>Padre / Responsable</th>
+                    <th>NIE Alumno</th>
+                    <th>Motivo de la Inasistencia</th>
+                    <th>Estado</th>
+                    <th>Acción del Docente</th>
+                  </tr>
+                </thead>
+                <tbody id="docente-justificaciones-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA DEDICADA: BUSCADOR INSTITUCIONAL DE FICHAS ESTUDIANTILES
+             ================================================================ -->
+        <section id="view-docente-fichas-busqueda" class="view-panel">
+          <div class="teacher-header-banner" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); margin-bottom: 25px;">
+            <div>
+              <h2><i class="fas fa-search"></i> Buscador Institucional de Fichas Estudiantiles</h2>
+              <p>Módulo institucional dedicado para la búsqueda y consulta de expedientes de estudiantes por NIE o apellidos, registro de observaciones y generación de fichas individuales oficiales en formato carta.</p>
+            </div>
+            <div>
+              <button class="btn btn-outline" style="color: #ffffff; border-color: rgba(255,255,255,0.4);" onclick="sarbelioApp.quickSearchDocente('', '')">
+                <i class="fas fa-users"></i> Mostrar Todos los Alumnos
+              </button>
+            </div>
+          </div>
+
+          <!-- FILTROS Y PRUEBAS RÁPIDAS -->
+          <div class="filter-card">
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
+              <i class="fas fa-search"></i> Criterios de Búsqueda de Fichas Estudiantiles
+            </h3>
+
+            <div style="margin-bottom:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+              <span style="font-size:12px; font-weight:600; color:var(--text-muted);">Pruebas rápidas:</span>
+              <button class="btn btn-outline btn-sm" onclick="sarbelioApp.quickSearchDocente('8492015', '')">⚡ Probar NIE: 8492015</button>
+              <button class="btn btn-outline btn-sm" onclick="sarbelioApp.quickSearchDocente('', 'Alvarado')">⚡ Probar Apellido: Alvarado</button>
+              <button class="btn btn-outline btn-sm" onclick="sarbelioApp.quickSearchDocente('', 'Rivas')">⚡ Probar Apellido: Rivas</button>
+            </div>
+
+            <div class="filter-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+              <div>
+                <label class="form-label">Buscar por NIE *</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                  <input type="text" id="docente-search-nie" class="form-control" placeholder="Ej: 8492015">
+                </div>
+              </div>
+              <div>
+                <label class="form-label">Buscar por Apellidos *</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-font"></i></span>
+                  <input type="text" id="docente-search-apellidos" class="form-control" placeholder="Ej: Alvarado">
+                </div>
+              </div>
+              <div style="display: flex; align-items: flex-end; gap: 8px;">
+                <button class="btn btn-primary" id="btn-docente-buscar" style="flex:1;">
+                  <i class="fas fa-search"></i> Buscar Estudiante
+                </button>
+                <button class="btn btn-secondary" id="btn-docente-limpiar">
+                  <i class="fas fa-times"></i> Ver Todos
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjetas de Resultado de Búsqueda -->
+          <div id="docente-search-results" class="student-cards-grid"></div>
+        </section>
+
+        <!-- ================================================================
+             VISTA: GESTIÓN DE MAESTROS (REGISTRO Y CUENTAS DE DOCENTES)
+             ================================================================ -->
+        <section id="view-maestros-gestion" class="view-panel">
+          <div class="teacher-header-banner" style="background: linear-gradient(135deg, #312e81 0%, #4338ca 100%);">
+            <div>
+              <h2><i class="fas fa-user-tie"></i> Módulo de Gestión y Registro de Maestros — INSAVI</h2>
+              <p>Cada docente puede registrar su propia cuenta institucional o ser dado de alta por la administración
+                para gestionar sus materias, clases y pase de lista por código QR.</p>
+            </div>
+            <div>
+              <button class="btn btn-success" onclick="sarbelioApp.openModal('modal-crear-maestro')">
+                <i class="fas fa-user-plus"></i> + Registrar Nuevo Maestro
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+              <h3 style="font-size: 16px; font-weight: 700; color: var(--primary); margin: 0;">
+                <i class="fas fa-chalkboard-teacher"></i> Listado Oficial de Docentes Registrados
+              </h3>
+              <div style="display:flex; gap:10px;">
+                <button class="btn btn-outline btn-sm" onclick="sarbelioApp.renderMaestrosTable()">
+                  <i class="fas fa-sync-alt"></i> Actualizar Lista
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Código Docente</th>
+                    <th>Nombre Completo</th>
+                    <th>Correo Electrónico</th>
+                    <th>Teléfono</th>
+                    <th>Usuario</th>
+                    <th>Especialidad / Módulo</th>
+                    <th>QR Asistencia</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="maestros-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA: PANTALLA PROYECTOR QR DE CLASE (EN VIVO PARA AULA)
+             ================================================================ -->
+        <section id="view-proyector-qr" class="view-panel">
+          <div
+            style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border-radius: 20px; padding: 35px; color: #ffffff; box-shadow: 0 20px 50px rgba(0,0,0,0.4); text-align: center; max-width: 900px; margin: 0 auto;">
+
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;">
+              <div style="text-align: left;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+                  <span class="badge"
+                    style="background: #6366f1; color: #ffffff; font-weight: 700; font-size: 12px; padding: 5px 12px; border-radius: 20px;">
+                    <i class="fas fa-broadcast-tower"></i> PROYECCIÓN EN VIVO
+                  </span>
+                  <span class="badge" id="projector-salon-badge"
+                    style="background: #0284c7; color: #ffffff; font-weight: 700; font-size: 12px; padding: 5px 12px; border-radius: 20px;">
+                    <i class="fas fa-door-open"></i> Laboratorio de Cómputo 1
+                  </span>
+                  <span class="badge" id="projector-mode-badge"
+                    style="background: #16a34a; color: #ffffff; font-weight: 800; font-size: 12px; padding: 5px 14px; border-radius: 20px;">
+                    <i class="fas fa-check-circle"></i> PERIODO PUNTUAL (Marcando como Presente)
+                  </span>
+                </div>
+                <h2 style="font-size: 24px; font-weight: 900; color: #ffffff; margin: 4px 0;"
+                  id="projector-class-title">1° ITSI "A" — Desarrollo de Software Web</h2>
+                <p style="font-size: 14px; color: #a5b4fc; margin: 0;" id="projector-teacher-name">Docente: Prof. Carlos
+                  Hernandez</p>
+              </div>
+
+              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <div
+                  style="background: rgba(255,255,255,0.08); padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.15);">
+                  <div style="font-size: 11px; color: #cbd5e1; font-weight: 700; text-transform: uppercase;">Tiempo Puntual</div>
+                  <div style="font-size: 26px; font-weight: 900; color: #38bdf8; font-family: monospace;"
+                    id="projector-countdown">10:00</div>
+                </div>
+                <div
+                  style="background: rgba(255,255,255,0.08); padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.15);">
+                  <div style="font-size: 11px; color: #cbd5e1; font-weight: 700; text-transform: uppercase;">Presentes</div>
+                  <div style="font-size: 26px; font-weight: 900; color: #4ade80;" id="projector-count-live">0</div>
+                </div>
+                <div
+                  style="background: rgba(255,255,255,0.08); padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.15);">
+                  <div style="font-size: 11px; color: #cbd5e1; font-weight: 700; text-transform: uppercase;">Tardanzas</div>
+                  <div style="font-size: 26px; font-weight: 900; color: #fbbf24;" id="projector-count-tardy">0</div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="background: #ffffff; padding: 25px; border-radius: 24px; display: inline-block; box-shadow: 0 15px 35px rgba(0,0,0,0.5); margin-bottom: 25px; max-width: 95%; min-width: 320px;">
+              <div id="projector-qr-code-render"
+                style="display: flex; justify-content: center; align-items: center; min-width: 260px; min-height: 260px;">
+              </div>
+              <div style="font-size: 13px; font-weight: 800; color: #1e1b4b; margin-top: 12px; letter-spacing: 1px;">
+                <i class="fas fa-qrcode"></i> ESCANEE CON SU TELÉFONO PARA REGISTRAR ASISTENCIA
+              </div>
+
+              <!-- ENLACE DIRECTO Y ID ABAJO DEL QR DEL PROYECTOR -->
+              <div style="margin-top: 15px; padding-top: 14px; border-top: 1px dashed #cbd5e1; text-align: center;">
+                <div style="font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
+                  <i class="fas fa-key" style="color: #4f46e5;"></i> ID de Sesión (Por si el QR no funciona):
+                </div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+                  <span id="projector-session-id-badge"
+                    style="font-family: monospace; font-size: 16px; font-weight: 900; background: #e0e7ff; color: #3730a3; padding: 5px 14px; border-radius: 8px; border: 1px solid #c7d2fe; letter-spacing: 1px;">
+                    DOC-QR-001
+                  </span>
+                  <button type="button" class="btn btn-sm btn-outline" style="padding: 4px 10px; font-size: 11px; font-weight: 700;"
+                    onclick="sarbelioApp.copyProjectorSessionId()" title="Copiar ID de Sesión">
+                    <i class="fas fa-copy"></i> Copiar ID
+                  </button>
+                </div>
+
+                <div style="font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
+                  <i class="fas fa-link" style="color: #2563eb;"></i> Enlace directo abajo del QR:
+                </div>
+                <div style="margin-bottom: 8px;">
+                  <a id="projector-qr-clickable-link" href="#" target="_blank"
+                    style="font-size: 13px; font-weight: 700; color: #2563eb; text-decoration: underline; word-break: break-all; display: inline-block; max-width: 320px;"
+                    title="Haga clic para abrir directamente la pantalla de asistencia">
+                    Generando enlace directo...
+                  </a>
+                </div>
+                <div style="font-size: 11px; color: #64748b; line-height: 1.4; max-width: 340px; margin: 0 auto;">
+                  💡 <em>¿Problemas al escanear? Toque el enlace directo o ingrese al sistema y digite el <strong>ID de Sesión</strong> arriba para marcar su asistencia.</em>
+                </div>
+                <div style="margin-top: 10px; padding: 6px 12px; background: #e0e7ff; border: 1px solid #c7d2fe; border-radius: 8px; font-size: 11px; color: #3730a3; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                  <i class="fas fa-map-marker-alt" style="color: #4f46e5;"></i> Requiere estar en el <strong>INSAVI</strong> (6ª Calle Poniente y 9ª Av. Sur, San Vicente).
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="background: rgba(255,255,255,0.06); padding: 16px 20px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.12); text-align: left;">
+              <label
+                style="font-size: 12px; color: #a5b4fc; font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                <i class="fas fa-wifi" style="color: #38bdf8;"></i> IP / Dirección de Servidor (para escaneo en
+                Celulares por Wi-Fi):
+              </label>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <input type="text" id="qr-server-ip-input" class="form-control"
+                  style="flex: 1; min-width: 220px; background: rgba(0,0,0,0.5); color: #38bdf8; border: 1px solid rgba(255,255,255,0.2); font-family: monospace; font-size: 13px;"
+                  placeholder="Ej: 192.168.1.50:3000 o mi-servidor.local:3000">
+                <button class="btn btn-success btn-sm" style="font-weight: 700;" onclick="sarbelioApp.saveServerIP()">
+                  <i class="fas fa-save"></i> Aplicar IP a Código QR
+                </button>
+              </div>
+              <small style="color: #94a3b8; font-size: 11px; margin-top: 6px; display: block;">
+                💡 <em>Si está en localhost, ingrese la dirección IP de su PC (ejemplo: <code>192.168.1.150:3000</code>)
+                  para que cualquier teléfono conectado al Wi-Fi pueda escanearlo y marcar asistencia sin errores.</em>
+              </small>
+            </div>
+
+            <div
+              style="background: rgba(255,255,255,0.05); padding: 15px 25px; border-radius: 14px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+              <div style="text-align: left; overflow: hidden; text-overflow: ellipsis; max-width: 500px;">
+                <span style="font-size: 11px; color: #94a3b8; font-weight: 600;">Enlace codificado en el QR:</span>
+                <div>
+                  <a href="#" target="_blank" style="font-size: 13px; font-family: monospace; color: #38bdf8; word-break: break-all; text-decoration: underline;"
+                    id="projector-direct-url">Generando URL de escaneo Wi-Fi...</a>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-success btn-sm" onclick="sarbelioApp.exportTeacherSessionAttendanceExcel()"
+                  style="background: #10b981; border: none; font-weight: 700;">
+                  <i class="fas fa-file-excel"></i> Descargar Excel
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="sarbelioApp.copyProjectorURL()"
+                  style="color: #ffffff; border-color: rgba(255,255,255,0.3);">
+                  <i class="fas fa-copy"></i> Copiar URL
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="sarbelioApp.cerrarSesionQRActual()">
+                  <i class="fas fa-lock"></i> Cerrar Sesión QR Ahora
+                </button>
+              </div>
+            </div>
+
+            <div style="text-align: left;">
+              <h4
+                style="font-size: 15px; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <span
+                  style="width: 10px; height: 10px; background: #22c55e; border-radius: 50%; display: inline-block;"></span>
+                Estudiantes Marcados en Tiempo Real (<span id="projector-total-counter">0</span>)
+              </h4>
+
+              <div
+                style="max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px;"
+                id="projector-live-students-list">
+                <div style="text-align: center; color: #94a3b8; padding: 15px; font-size: 13px;">
+                  Esperando que los estudiantes escaneen el código QR en el aula...
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA: HISTORIAL DE SESIONES QR Y REPORTES PARA DOCENTE
+             ================================================================ -->
+        <section id="view-docente-historial" class="view-panel">
+          <div class="teacher-header-banner">
+            <div>
+              <h2><i class="fas fa-history"></i> Historial de Sesiones QR Generadas</h2>
+              <p>Consulte el registro histórico de todas las sesiones de asistencia con código QR creadas en sus clases.
+              </p>
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th># Sesión</th>
+                    <th>Materia / Clase</th>
+                    <th>Grado & Sección</th>
+                    <th>Fecha / Hora Inicio</th>
+                    <th>Duración</th>
+                    <th>Total Asistentes</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="historial-sesiones-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             VISTA 4: PERFIL DEL ESTUDIANTE (FICHA DE MATRÍCULA AUTO-REGISTRO)
+             ================================================================ -->
+        <section id="view-estudiante-ficha" class="view-panel">
+          <div class="enrollment-header-banner">
+            <h2><i class="fas fa-address-card"></i> Formulario Ficha de Matrícula — Portal del Estudiante</h2>
+            <p>Complete el formulario a continuación. Al presionar "Guardar Ficha", el perfil se añadirá inmediatamente
+              al sistema.</p>
+          </div>
+
+          <div class="filter-card">
+            <form id="form-ficha-matricula">
+
+              <h3 class="section-form-title"><i class="fas fa-list-ol"></i> I. Identificación</h3>
+
+              <div class="filter-grid" style="grid-template-columns: repeat(3, 1fr);">
+
+                <!-- Bachillerato -->
+                <div>
+                  <label class="form-label">Bachillerato *</label>
+                  <select id="mat_bachillerato" class="form-select" required>
+                    <option value="">-- Seleccionar --</option>
+                    <option value="General">General</option>
+                    <option value="Administrativo Contable">Administrativo Contable</option>
+                    <option value="ITSI">ITSI (Software)</option>
+                    <option value="Turismo">Turismo</option>
+                    <option value="Salud">Salud</option>
+                    <option value="Automotriz">Automotriz</option>
+                  </select>
+                </div>
+
+                <!-- Año -->
+                <div>
+                  <label class="form-label">Año *</label>
+                  <select id="mat_anio" class="form-select" required>
+                    <option value="">-- Seleccionar --</option>
+                    <option value="Primer Año">Primer Año</option>
+                    <option value="Segundo Año">Segundo Año</option>
+                    <option value="Tercer Año">Tercer Año</option>
+                  </select>
+                </div>
+
+                <!-- Sección con Botones Estéticos -->
+                <div style="grid-column: span 3;">
+                  <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-layer-group"></i> Sección Asignada *</span>
+                    <span style="font-size: 11.5px; color: var(--primary); font-weight: 700;"
+                      id="mat_seccion_preview">Seleccionada: Sección A</span>
+                  </label>
+                  <input type="hidden" id="mat_seccion" value="A" required>
+                  <div class="seccion-buttons-container">
+                    <button type="button" class="btn-seccion-pill active"
+                      onclick="sarbelioApp.selectFormSeccion('A', this, 'mat_seccion', 'mat_seccion_preview')">
+                      <span class="sec-badge">A</span>
+                      <span class="sec-text">Sección A</span>
+                    </button>
+                    <button type="button" class="btn-seccion-pill"
+                      onclick="sarbelioApp.selectFormSeccion('B', this, 'mat_seccion', 'mat_seccion_preview')">
+                      <span class="sec-badge">B</span>
+                      <span class="sec-text">Sección B</span>
+                    </button>
+                    <button type="button" class="btn-seccion-pill"
+                      onclick="sarbelioApp.selectFormSeccion('C', this, 'mat_seccion', 'mat_seccion_preview')">
+                      <span class="sec-badge">C</span>
+                      <span class="sec-text">Sección C</span>
+                    </button>
+                    <button type="button" class="btn-seccion-pill"
+                      onclick="sarbelioApp.selectFormSeccion('D', this, 'mat_seccion', 'mat_seccion_preview')">
+                      <span class="sec-badge">D</span>
+                      <span class="sec-text">Sección D</span>
+                    </button>
+                    <button type="button" class="btn-seccion-pill"
+                      onclick="sarbelioApp.selectFormSeccion('E', this, 'mat_seccion', 'mat_seccion_preview')">
+                      <span class="sec-badge">E</span>
+                      <span class="sec-text">Sección E</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Nombre Completo -->
+                <div style="grid-column: span 2;">
+                  <label class="form-label">Nombre Completo *</label>
+                  <input type="text" id="mat_nombre_completo" class="form-control"
+                    placeholder="Ej: Daniel Alexander Lopez Cruz" required>
+                </div>
+
+                <!-- NIE -->
+                <div>
+                  <label class="form-label">NIE *</label>
+                  <input type="text" id="mat_nie" class="form-control" placeholder="Ej: 8492015" required>
+                </div>
+
+                <!-- Edad -->
+                <div>
+                  <label class="form-label">Edad *</label>
+                  <input type="number" id="mat_edad" class="form-control" min="12" max="25" placeholder="Ej: 17"
+                    required>
+                </div>
+
+                <!-- Docente Encargado (Orientador) -->
+                <div style="grid-column: span 2;">
+                  <label class="form-label">Docente Encargado (Orientador) *</label>
+                  <input type="text" id="mat_docente_orientador" class="form-control"
+                    placeholder="Ej: Prof. Carlos Hernandez" required>
+                </div>
+
+                <!-- Nombre Encargado -->
+                <div style="grid-column: span 2;">
+                  <label class="form-label">Nombre Encargado *</label>
+                  <input type="text" id="mat_nombre_encargado" class="form-control"
+                    placeholder="Nombre completo del padre o responsable" required>
+                </div>
+
+                <!-- DUI Encargado -->
+                <div>
+                  <label class="form-label">DUI Encargado *</label>
+                  <input type="text" id="mat_dui_encargado" class="form-control" placeholder="00000000-0" required>
+                </div>
+
+                <!-- Teléfono -->
+                <div>
+                  <label class="form-label">Teléfono *</label>
+                  <input type="text" id="mat_telefono" class="form-control" placeholder="7000-0000" required>
+                </div>
+
+                <!-- Correo -->
+                <div style="grid-column: span 2;">
+                  <label class="form-label">Correo Electrónico</label>
+                  <input type="email" id="mat_correo" class="form-control" placeholder="estudiante@correo.com">
+                </div>
+
+                <!-- Dirección -->
+                <div style="grid-column: span 3;">
+                  <label class="form-label">Dirección *</label>
+                  <input type="text" id="mat_direccion" class="form-control" placeholder="Dirección completa del hogar"
+                    required>
+                </div>
+
+                <!-- Con quién vive -->
+                <div>
+                  <label class="form-label">Con quién vive *</label>
+                  <select id="mat_con_quien_vive" class="form-select" required>
+                    <option value="Padre y Madre">Padre y Madre</option>
+                    <option value="Solo Madre">Solo Madre</option>
+                    <option value="Solo Padre">Solo Padre</option>
+                    <option value="Abuelos">Abuelos</option>
+                    <option value="Tíos">Tíos</option>
+                    <option value="Tutor Legal">Tutor Legal / Otro</option>
+                  </select>
+                </div>
+
+                <!-- ¿Repite? -->
+                <div>
+                  <label class="form-label">¿Repite? *</label>
+                  <select id="mat_repite" class="form-select" required>
+                    <option value="No">No</option>
+                    <option value="Sí">Sí</option>
+                  </select>
+                </div>
+
+                <!-- Discapacidad -->
+                <div>
+                  <label class="form-label">Discapacidad</label>
+                  <select id="mat_discapacidad" class="form-select">
+                    <option value="Ninguna">Ninguna</option>
+                    <option value="Visual">Visual</option>
+                    <option value="Auditiva">Auditiva</option>
+                    <option value="Motora">Motora</option>
+                    <option value="Intelectual">Intelectual</option>
+                    <option value="Otra">Otra</option>
+                  </select>
+                </div>
+
+                <!-- Trastorno -->
+                <div style="grid-column: span 3;">
+                  <label class="form-label">Trastorno</label>
+                  <select id="mat_trastorno" class="form-select">
+                    <option value="Ninguno">Ninguno</option>
+                    <option value="TDAH">TDAH (Déficit de Atención)</option>
+                    <option value="Espectro Autista">Espectro Autista</option>
+                    <option value="Dislexia">Dislexia</option>
+                    <option value="Ansiedad">Ansiedad / Depresión</option>
+                    <option value="Otro">Otro (Especificar en observaciones)</option>
+                  </select>
+                </div>
+
+              </div>
+
+              <div style="margin-top: 25px; display: flex; justify-content: flex-end; gap: 15px;">
+                <button type="submit" class="btn btn-success btn-lg">
+                  <i class="fas fa-save"></i> Guardar Ficha de Matrícula
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA 5: PORTAL DEL PADRE DE FAMILIA / RESPONSABLE
+             ================================================================ -->
+        <section id="view-padre-portal" class="view-panel">
+
+          <!-- ESTADO 1: FORMULARIO DE INICIO DE SESIÓN / CREACIÓN DE CUENTA PADRE -->
+          <div id="padre-auth-container" style="max-width: 550px; margin: 20px auto;">
+
+            <!-- Botón de Acceso Demo Rápido -->
+            <div
+              style="background:var(--accent-light); border:1px solid var(--accent); padding:12px; border-radius:8px; margin-bottom:15px; text-align:center;">
+              <p style="font-weight:700; color:var(--accent); font-size:13px; margin-bottom:6px;">⚡ Pruebas Rápidas de
+                Visualización:</p>
+              <button class="btn btn-warning btn-sm" onclick="sarbelioApp.quickLoginPadre()" style="width:100%;">
+                <i class="fas fa-bolt"></i> Iniciar Sesión Rápida como Padre Demo (Roberto Alvarado)
+              </button>
+            </div>
+
+            <div class="auth-card">
+              <div class="auth-header">
+                <i class="fas fa-users-cog" style="font-size: 40px; color: var(--primary);"></i>
+                <h2>Acceso al Portal del Responsable</h2>
+                <p>Consulte las asistencias, inasistencias justificadas/sin justificar y calificaciones de su hijo/a.
+                </p>
+              </div>
+
+              <form id="form-padre-login">
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label class="form-label">DUI o Nombre de Usuario del Padre</label>
+                  <input type="text" id="padre_login_user" class="form-control" placeholder="02345678-4 o roberto.padre"
+                    required value="02345678-4">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                  <label class="form-label">Contraseña</label>
+                  <input type="password" id="padre_login_pass" class="form-control" placeholder="••••••••" required
+                    value="123456">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="width:100%;">
+                  <i class="fas fa-sign-in-alt"></i> Iniciar Sesión como Responsable
+                </button>
+              </form>
+
+              <div
+                style="margin-top: 20px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <p style="color: var(--text-muted); font-size: 13px;">¿Aún no ha creado su cuenta de responsable?</p>
+                <button class="btn btn-outline btn-sm" id="btn-open-padre-register" style="margin-top: 8px;">
+                  <i class="fas fa-user-plus"></i> Crear Cuenta de Padre de Familia
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ESTADO 2: DASHBOARD DEL PADRE LOGUEADO -->
+          <div id="padre-dashboard-container" style="display: none;">
+
+            <!-- Banner del Padre -->
+            <div class="parent-welcome-banner">
+              <div class="parent-avatar"><i class="fas fa-user-tie"></i></div>
+              <div>
+                <h2 id="parent-welcome-name">Bienvenido/a, Roberto Carlos Alvarado Perez</h2>
+                <p>Responsable Legal del Estudiante: <strong id="parent-child-name"
+                    style="color:#ffffff; font-weight:700;">Carlos Eduardo Alvarado Gomez</strong> (NIE: <span
+                    id="parent-child-nie">8492015</span>)</p>
+              </div>
+              <button class="btn btn-outline btn-sm" id="btn-padre-logout"
+                style="color:#ffffff; border-color:#ffffff; margin-left:auto;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+              </button>
+            </div>
+
+            <!-- Resumen Estadístico de Asistencias del Hijo -->
+            <div class="stats-grid" style="margin-top: 20px;">
+              <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info">
+                  <h3 id="parent-stat-justificadas">2</h3>
+                  <p>Ausencias Justificadas</p>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon red"><i class="fas fa-times-circle"></i></div>
+                <div class="stat-info">
+                  <h3 id="parent-stat-sin-justificar">1</h3>
+                  <p>Ausencias Sin Justificar</p>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-clipboard-check"></i></div>
+                <div class="stat-info">
+                  <h3 id="parent-stat-total">3</h3>
+                  <p>Total de Inasistencias</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- APARTADO EXCLUSIVO PADRE: ESTADO DE MIS SOLICITUDES DE JUSTIFICACIÓN -->
+            <div class="filter-card" style="margin-top: 20px; border-left: 5px solid var(--accent);">
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap:wrap; gap:10px;">
+                <div>
+                  <span class="badge badge-warning" style="margin-bottom: 4px;">Apartado Exclusivo del
+                    Responsable</span>
+                  <h3 style="font-size: 16px; font-weight: 800; color: var(--primary); margin:0;">
+                    <i class="fas fa-paper-plane" style="color: var(--accent);"></i> Mis Solicitudes de Justificación
+                    Enviadas al Maestro
+                  </h3>
+                </div>
+
+                <button class="btn btn-warning" id="btn-open-justificar-modal">
+                  <i class="fas fa-paper-plane"></i> Redactar Nueva Justificación
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Fecha Inasistencia</th>
+                      <th>Motivo Detallado de Ausencia</th>
+                      <th>Estado de la Solicitud</th>
+                      <th>Respuesta del Maestro / Orientador</th>
+                    </tr>
+                  </thead>
+                  <tbody id="parent-justifications-status-body"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- TABLA DE ASISTENCIAS DEL HIJO -->
+            <div class="filter-card" style="margin-top: 20px;">
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap:wrap; gap:10px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--primary);">
+                  <i class="fas fa-calendar-alt"></i> Registro Detallado de Inasistencias de Mi Hijo/a
+                </h3>
+              </div>
+
+              <div class="table-responsive">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Materia</th>
+                      <th>Estado de Asistencia</th>
+                      <th>Motivo / Observación del Docente</th>
+                    </tr>
+                  </thead>
+                  <tbody id="parent-asistencias-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- PLUS FEATURES DEL PADRE DE FAMILIA -->
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+
+              <!-- PLUS FEATURE 1: BOLETA DE NOTAS Y RENDIMIENTO ACADÉMICO -->
+              <div class="filter-card">
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
+                  <i class="fas fa-star" style="color:var(--accent);"></i> Rendimiento Académico / Calificaciones
+                </h3>
+                <div class="table-responsive">
+                  <table class="custom-table" style="font-size: 12px;">
+                    <thead>
+                      <tr>
+                        <th>Módulo / Asignatura</th>
+                        <th>Periodo 1</th>
+                        <th>Periodo 2</th>
+                        <th>Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Desarrollo de Aplicaciones Web (ITSI)</td>
+                        <td><strong>9.5</strong></td>
+                        <td><strong>9.0</strong></td>
+                        <td><span class="badge badge-success">Excelente</span></td>
+                      </tr>
+                      <tr>
+                        <td>Matemáticas</td>
+                        <td><strong>8.5</strong></td>
+                        <td><strong>8.8</strong></td>
+                        <td><span class="badge badge-success">Aprobado</span></td>
+                      </tr>
+                      <tr>
+                        <td>Lenguaje y Literatura</td>
+                        <td><strong>9.0</strong></td>
+                        <td><strong>8.5</strong></td>
+                        <td><span class="badge badge-success">Aprobado</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- PLUS FEATURE 2: BITÁCORA DE OBSERVACIONES DEL DOCENTE -->
+              <div class="filter-card">
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
+                  <i class="fas fa-comment-dots" style="color:var(--info);"></i> Avisos y Observaciones del Orientador
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <div
+                    style="background: var(--bg-main); padding: 12px; border-left: 4px solid var(--success); border-radius: 4px;">
+                    <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
+                      <span>Prof. Carlos Hernandez (Orientador)</span>
+                      <span>2026-03-01</span>
+                    </div>
+                    <p style="font-size:13px; font-weight:600; margin-top:4px;">Excelente desempeño en el proyecto de
+                      software del módulo final.</p>
+                  </div>
+                  <div
+                    style="background: var(--bg-main); padding: 12px; border-left: 4px solid var(--warning); border-radius: 4px;">
+                    <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
+                      <span>Prof. Carlos Hernandez (Orientador)</span>
+                      <span>2026-02-18</span>
+                    </div>
+                    <p style="font-size:13px; font-weight:500; margin-top:4px;">Recordatorio de presentar la nota de
+                      justificación por la inasistencia del día de hoy.</p>
+                  </div>
+                </div>
+
+                <div style="margin-top: 15px; text-align: right;">
+                  <button class="btn btn-secondary btn-sm" onclick="sarbelioApp.printParentCard()">
+                    <i class="fas fa-print"></i> Ver / Imprimir Ficha Carta del Hijo
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTAS DE CONFIGURACIÓN Y REPORTES (ADMIN)
+             ================================================================ -->
+        <!-- ================================================================
+             VISTA: ASISTENTE DE MATRÍCULA EN 6 PASOS (NUEVO ESTUDIANTE)
+             ================================================================ -->
+        <section id="view-nuevo-estudiante" class="view-panel">
+          <div class="enrollment-header-banner">
+            <h2><i class="fas fa-magic"></i> Asistente Institucional de Matrícula (Proceso Guiado en 6 Pasos)</h2>
+            <p>Complete paso a paso la Ficha de Matrícula del estudiante para registrar su expediente en el Instituto
+              Nacional Dr. Sarbelio Navarrete.</p>
+          </div>
+
+          <!-- Indicador de Pasos del Wizard -->
+          <div class="filter-card" style="margin-bottom: 20px; padding: 15px 20px;">
+            <div class="wizard-steps-bar"
+              style="display: flex; justify-content: space-between; align-items: center; position: relative;">
+              <div class="wizard-step active" data-step="1"
+                style="display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 2;">
+                <div class="step-icon"
+                  style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                  1</div>
+                <span
+                  style="font-size: 11px; font-weight: 600; margin-top: 4px; color: var(--secondary);">Identificación</span>
+              </div>
+              <div class="wizard-step" data-step="2"
+                style="display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 2;">
+                <div class="step-icon"
+                  style="width: 36px; height: 36px; border-radius: 50%; background: #e2e8f0; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                  2</div>
+                <span style="font-size: 11px; font-weight: 600; margin-top: 4px; color: var(--text-muted);">Datos
+                  Alumno</span>
+              </div>
+              <div class="wizard-step" data-step="3"
+                style="display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 2;">
+                <div class="step-icon"
+                  style="width: 36px; height: 36px; border-radius: 50%; background: #e2e8f0; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                  3</div>
+                <span style="font-size: 11px; font-weight: 600; margin-top: 4px; color: var(--text-muted);">Padre /
+                  Encargado</span>
+              </div>
+              <div class="wizard-step" data-step="4"
+                style="display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 2;">
+                <div class="step-icon"
+                  style="width: 36px; height: 36px; border-radius: 50%; background: #e2e8f0; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                  4</div>
+                <span style="font-size: 11px; font-weight: 600; margin-top: 4px; color: var(--text-muted);">Salud /
+                  Especial</span>
+              </div>
+              <div class="wizard-step" data-step="5"
+                style="display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 2;">
+                <div class="step-icon"
+                  style="width: 36px; height: 36px; border-radius: 50%; background: #e2e8f0; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                  5</div>
+                <span
+                  style="font-size: 11px; font-weight: 600; margin-top: 4px; color: var(--text-muted);">Orientador</span>
+              </div>
+              <div class="wizard-step" data-step="6"
+                style="display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 2;">
+                <div class="step-icon"
+                  style="width: 36px; height: 36px; border-radius: 50%; background: #e2e8f0; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                  6</div>
+                <span
+                  style="font-size: 11px; font-weight: 600; margin-top: 4px; color: var(--text-muted);">Confirmar</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contenido de los Pasos -->
+          <div class="filter-card">
+
+            <!-- PASO 1: Identificación y Expediente -->
+            <div class="wizard-content-step" data-step="1">
+              <h3 class="section-form-title"><i class="fas fa-id-card"></i> Paso 1: Identificación del Estudiante y
+                Especialidad</h3>
+              <div class="filter-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div>
+                  <label class="form-label">Número de NIE *</label>
+                  <input type="text" id="wiz_nie" class="form-control" placeholder="Ej: 8492015" required>
+                </div>
+                <div>
+                  <label class="form-label">Código Expediente</label>
+                  <input type="text" id="wiz_expediente" class="form-control" placeholder="Ej: EXP-2026-005">
+                </div>
+                <div>
+                  <label class="form-label">Bachillerato Asignado *</label>
+                  <select id="wiz_bachillerato" class="form-select" required>
+                    <option value="">-- Seleccionar --</option>
+                    <option value="General">General</option>
+                    <option value="Administrativo Contable">Administrativo Contable</option>
+                    <option value="ITSI">ITSI (Desarrollo de Software)</option>
+                    <option value="Turismo">Turismo</option>
+                    <option value="Salud">Salud</option>
+                    <option value="Automotriz">Automotriz</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Año de Bachillerato *</label>
+                  <select id="wiz_grado" class="form-select" required>
+                    <option value="Primer Año">Primer Año</option>
+                    <option value="Segundo Año">Segundo Año</option>
+                    <option value="Tercer Año">Tercer Año</option>
+                  </select>
+                </div>
+                <div style="grid-column: span 3;">
+                  <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-layer-group"></i> Sección Académica *</span>
+                    <span style="font-size: 11.5px; color: var(--primary); font-weight: 700;"
+                      id="wiz_seccion_preview">Seleccionada: Sección A</span>
+                  </label>
+                  <input type="hidden" id="wiz_seccion" value="A" required>
+                  <div class="seccion-buttons-container">
+                    <button type="button" class="btn-seccion-pill active"
+                      onclick="sarbelioApp.selectFormSeccion('A', this, 'wiz_seccion', 'wiz_seccion_preview')">
+                      <span class="sec-badge">A</span>
+                      <span class="sec-text">Sección A</span>
+                    </button>
+                    <button type="button" class="btn-seccion-pill"
+                      onclick="sarbelioApp.selectFormSeccion('B', this, 'wiz_seccion', 'wiz_seccion_preview')">
+                      <span class="sec-badge">B</span>
+                      <span class="sec-text">Sección B</span>
+                    </button>
+                    <button type="button" class="btn-seccion-pill"
+                      onclick="sarbelioApp.selectFormSeccion('C', this, 'wiz_seccion', 'wiz_seccion_preview')">
+                      <span class="sec-badge">C</span>
+                      <span class="sec-text">Sección C</span>
+                    </button>
+                    <button type="button" class="btn-seccion-pill"
+                      onclick="sarbelioApp.selectFormSeccion('D', this, 'wiz_seccion', 'wiz_seccion_preview')">
+                      <span class="sec-badge">D</span>
+                      <span class="sec-text">Sección D</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                <button class="btn btn-primary btn-wizard-next">Siguiente paso <i
+                    class="fas fa-arrow-right"></i></button>
+              </div>
+            </div>
+
+            <!-- PASO 2: Datos Personales -->
+            <div class="wizard-content-step" data-step="2" style="display: none;">
+              <h3 class="section-form-title"><i class="fas fa-user"></i> Paso 2: Datos Personales del Estudiante</h3>
+              <div class="filter-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div>
+                  <label class="form-label">Nombres del Alumno *</label>
+                  <input type="text" id="wiz_nombres" class="form-control" placeholder="Ej: Daniel Alexander" required>
+                </div>
+                <div>
+                  <label class="form-label">Apellidos del Alumno *</label>
+                  <input type="text" id="wiz_apellidos" class="form-control" placeholder="Ej: Lopez Cruz" required>
+                </div>
+                <div>
+                  <label class="form-label">Fecha de Nacimiento *</label>
+                  <input type="date" id="wiz_fecha_nacimiento" class="form-control" required value="2008-05-14">
+                </div>
+                <div>
+                  <label class="form-label">Edad Calculada</label>
+                  <div id="wiz_edad_calculada"
+                    style="padding: 10px; background: #f1f5f9; border-radius: 6px; font-weight: 700; color: var(--primary);">
+                    17 años</div>
+                </div>
+                <div>
+                  <label class="form-label">Sexo *</label>
+                  <select id="wiz_sexo" class="form-select" required>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Correo Electrónico</label>
+                  <input type="email" id="wiz_correo" class="form-control" placeholder="alumno@sarbelio.edu.sv">
+                </div>
+                <div style="grid-column: span 3;">
+                  <label class="form-label">Dirección de Residencia Completa *</label>
+                  <input type="text" id="wiz_direccion" class="form-control"
+                    placeholder="Barrio / Colonia, Calle, Casa #, Municipio" required>
+                </div>
+              </div>
+              <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                <button class="btn btn-secondary btn-wizard-prev"><i class="fas fa-arrow-left"></i> Anterior</button>
+                <button class="btn btn-primary btn-wizard-next">Siguiente paso <i
+                    class="fas fa-arrow-right"></i></button>
+              </div>
+            </div>
+
+            <!-- PASO 3: Padre / Encargado -->
+            <div class="wizard-content-step" data-step="3" style="display: none;">
+              <h3 class="section-form-title"><i class="fas fa-users"></i> Paso 3: Datos del Padre de Familia /
+                Responsable Legal</h3>
+              <div class="filter-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div style="grid-column: span 2;">
+                  <label class="form-label">Nombre Completo del Encargado *</label>
+                  <input type="text" id="wiz_encargado_nombre" class="form-control"
+                    placeholder="Nombre completo del padre o tutor" required>
+                </div>
+                <div>
+                  <label class="form-label">DUI del Encargado *</label>
+                  <input type="text" id="wiz_encargado_dui" class="form-control" placeholder="00000000-0" required>
+                </div>
+                <div>
+                  <label class="form-label">Teléfono de Contacto *</label>
+                  <input type="text" id="wiz_encargado_telefono" class="form-control" placeholder="7000-0000" required>
+                </div>
+                <div>
+                  <label class="form-label">Con quién vive el Estudiante *</label>
+                  <select id="wiz_con_quien_vive" class="form-select" required>
+                    <option value="Padre y Madre">Padre y Madre</option>
+                    <option value="Solo Madre">Solo Madre</option>
+                    <option value="Solo Padre">Solo Padre</option>
+                    <option value="Abuelos">Abuelos</option>
+                    <option value="Tutor Legal">Tutor Legal / Otro</option>
+                  </select>
+                </div>
+              </div>
+              <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                <button class="btn btn-secondary btn-wizard-prev"><i class="fas fa-arrow-left"></i> Anterior</button>
+                <button class="btn btn-primary btn-wizard-next">Siguiente paso <i
+                    class="fas fa-arrow-right"></i></button>
+              </div>
+            </div>
+
+            <!-- PASO 4: Salud / Inclusión -->
+            <div class="wizard-content-step" data-step="4" style="display: none;">
+              <h3 class="section-form-title"><i class="fas fa-notes-medical"></i> Paso 4: Salud, Inclusión Educativa &
+                Antecedentes</h3>
+              <div class="filter-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div>
+                  <label class="form-label">¿Repite Año Escolar? *</label>
+                  <select id="wiz_repite" class="form-select" required>
+                    <option value="No">No</option>
+                    <option value="Sí">Sí</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Discapacidad</label>
+                  <select id="wiz_discapacidad" class="form-select">
+                    <option value="Ninguna">Ninguna</option>
+                    <option value="Visual">Visual</option>
+                    <option value="Auditiva">Auditiva</option>
+                    <option value="Motora">Motora</option>
+                    <option value="Intelectual">Intelectual</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Trastorno o Condición Especial</label>
+                  <select id="wiz_trastorno" class="form-select">
+                    <option value="Ninguno">Ninguno</option>
+                    <option value="TDAH">TDAH (Déficit de Atención)</option>
+                    <option value="Espectro Autista">Espectro Autista</option>
+                    <option value="Dislexia">Dislexia</option>
+                    <option value="Ansiedad">Ansiedad / Depresión</option>
+                  </select>
+                </div>
+                <div style="grid-column: span 3;">
+                  <label class="form-label">Observaciones Adicionales de la Ficha</label>
+                  <textarea id="wiz_observaciones" class="form-control" rows="2"
+                    placeholder="Detalles de salud, medicamentos, fortalezas del estudiante..."></textarea>
+                </div>
+              </div>
+              <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                <button class="btn btn-secondary btn-wizard-prev"><i class="fas fa-arrow-left"></i> Anterior</button>
+                <button class="btn btn-primary btn-wizard-next">Siguiente paso <i
+                    class="fas fa-arrow-right"></i></button>
+              </div>
+            </div>
+
+            <!-- PASO 5: Orientador -->
+            <div class="wizard-content-step" data-step="5" style="display: none;">
+              <h3 class="section-form-title"><i class="fas fa-user-tie"></i> Paso 5: Asignación de Docente Orientador
+              </h3>
+              <div class="filter-grid" style="grid-template-columns: 1fr 1fr;">
+                <div style="grid-column: span 2;">
+                  <label class="form-label">Docente Orientador Asignado *</label>
+                  <input type="text" id="wiz_docente_orientador" class="form-control"
+                    placeholder="Ej: Prof. Carlos Hernandez / Licda. Maria Rodriguez" required
+                    value="Prof. Carlos Hernandez">
+                </div>
+              </div>
+              <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                <button class="btn btn-secondary btn-wizard-prev"><i class="fas fa-arrow-left"></i> Anterior</button>
+                <button class="btn btn-primary btn-wizard-next">Revisar Resumen <i
+                    class="fas fa-arrow-right"></i></button>
+              </div>
+            </div>
+
+            <!-- PASO 6: Resumen y Confirmación -->
+            <div class="wizard-content-step" data-step="6" style="display: none;">
+              <h3 class="section-form-title"><i class="fas fa-check-double"></i> Paso 6: Resumen y Confirmación de
+                Matrícula</h3>
+              <p style="margin-bottom: 15px; color: var(--text-muted);">Por favor verifique los datos ingresados antes
+                de confirmar la inscripción institucional.</p>
+
+              <div id="wizard-summary-box"
+                style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+              </div>
+
+              <div style="display: flex; justify-content: space-between;">
+                <button class="btn btn-secondary btn-wizard-prev"><i class="fas fa-arrow-left"></i> Modificar
+                  Datos</button>
+                <button class="btn btn-success btn-lg" id="btn-wizard-finish">
+                  <i class="fas fa-check-circle"></i> Confirmar y Guardar Matrícula
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA: MÓDULO DE REPORTES INSTITUCIONALES (COMPLETO)
+             ================================================================ -->
+        <section id="view-reportes" class="view-panel">
+          <div class="filter-card" style="margin-bottom: 20px;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+              <div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--primary);"><i
+                    class="fas fa-file-invoice"></i> Módulo de Reportes Institucionales</h3>
+                <p style="color: var(--text-muted); font-size: 13px;">Genere, filtre y exporte reportes oficiales de
+                  estudiantes, asistencias y justificaciones.</p>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-success" onclick="sarbelioApp.exportReportExcel()"><i
+                    class="fas fa-file-excel"></i> Exportar Excel (.xls)</button>
+                <button class="btn btn-secondary" onclick="sarbelioApp.exportReportCSV()"><i
+                    class="fas fa-file-csv"></i> Exportar CSV</button>
+                <button class="btn btn-primary" onclick="sarbelioApp.printReportView()"><i class="fas fa-print"></i>
+                  Imprimir Reporte Carta</button>
+              </div>
+            </div>
+
+            <!-- Filtros de Reportes -->
+            <div class="filter-grid" style="margin-top: 15px; grid-template-columns: repeat(4, 1fr);">
+              <div>
+                <label class="form-label">Tipo de Reporte</label>
+                <select id="report-type" class="form-select" onchange="sarbelioApp.renderReportsTable()">
+                  <option value="estudiantes">1. Listado General de Matrícula</option>
+                  <option value="asistencias">2. Consolidados de Asistencia & Inasistencias</option>
+                  <option value="justificaciones">3. Reporte de Justificaciones de Padres</option>
+                  <option value="padres">4. Directorio de Padres y Responsables</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label">Filtrar por Bachillerato</label>
+                <select id="report-filter-bachillerato" class="form-select" onchange="sarbelioApp.renderReportsTable()">
+                  <option value="">Todos los Bachilleratos</option>
+                  <option value="General">General</option>
+                  <option value="Administrativo Contable">Administrativo Contable</option>
+                  <option value="ITSI">ITSI (Software)</option>
+                  <option value="Turismo">Turismo</option>
+                  <option value="Salud">Salud</option>
+                  <option value="Automotriz">Automotriz</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label">Filtrar por Año</label>
+                <select id="report-filter-anio" class="form-select" onchange="sarbelioApp.renderReportsTable()">
+                  <option value="">Todos los Años</option>
+                  <option value="Primer Año">Primer Año</option>
+                  <option value="Segundo Año">Segundo Año</option>
+                  <option value="Tercer Año">Tercer Año</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label">Estado</label>
+                <select id="report-filter-estado" class="form-select" onchange="sarbelioApp.renderReportsTable()">
+                  <option value="">Todos</option>
+                  <option value="Activo">Activos</option>
+                  <option value="Inactivo">Inactivos / Retirados</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vista Previa de Tabla de Reporte -->
+          <div class="table-card">
+            <div id="report-summary-pills"
+              style="padding: 12px 16px; background: var(--primary-light); border-bottom: 1px solid var(--border-color); display: flex; gap: 15px; font-size: 12px; font-weight: 700; color: var(--primary);">
+              <span id="report-stat-count">Total Registros: 0</span>
+              <span id="report-stat-extra"></span>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table" id="table-reportes-view">
+                <thead id="report-table-head"></thead>
+                <tbody id="report-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             VISTA: CONTROL DE USUARIOS Y PERMISOS (COMPLETO)
+             ================================================================ -->
+        <section id="view-usuarios" class="view-panel">
+          <div class="filter-card" style="margin-bottom: 20px;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+              <div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--primary);"><i class="fas fa-user-shield"></i>
+                  Control de Usuarios y Permisos</h3>
+                <p style="color: var(--text-muted); font-size: 13px;">Administre las cuentas de acceso del personal
+                  directivo, docentes y responsables de familia.</p>
+              </div>
+              <button class="btn btn-primary" onclick="sarbelioApp.openModal('modal-crear-usuario')">
+                <i class="fas fa-user-plus"></i> Crear Nuevo Usuario
+              </button>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre Completo</th>
+                    <th>Usuario</th>
+                    <th>Correo Electrónico</th>
+                    <th>Rol de Sistema</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-configuracion" class="view-panel">
+          <div class="filter-card" style="margin-bottom: 20px;">
+            <h3><i class="fas fa-cog"></i> Configuración del Sistema</h3>
+            <p style="margin-top:5px; color:var(--text-muted);">Parámetros institucionales del Instituto Nacional Dr.
+              Sarbelio Navarrete.</p>
+          </div>
+
+          <!-- PANEL COMPLETO DE INTEGRACIÓN CON GOOGLE SHEETS -->
+          <div class="filter-card" style="border-top: 4px solid #0f9d58;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+              <h3 style="color: #0f9d58; font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-table" style="font-size: 24px;"></i> Conexión Directa con Google Sheets (Asistencia QR)
+              </h3>
+              <span class="badge" id="cfg-gsheets-status-pill"
+                style="font-size: 12px; padding: 6px 12px; background: #e2e8f0; color: #475569;">
+                ⚪ Sin Configurar
+              </span>
+            </div>
+
+            <p style="font-size: 13.5px; color: var(--text-main); margin-bottom: 15px; line-height: 1.6;">
+              Conecte el sistema a su propia Hoja de Cálculo de <strong>Google Sheets</strong> mediante <strong>Google
+                Apps Script</strong>.
+              Cada vez que un estudiante o docente escanea el código QR, la asistencia se registra de inmediato y se
+              clasifica automáticamente por:
+              <strong>Día (Fecha)</strong>, <strong>Grado / Especialidad</strong>, <strong>Sección</strong>, <strong>Año
+                de Estudio</strong> y <strong>Maestro Encargado</strong>.
+            </p>
+
+            <div class="filter-grid" style="grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
+              <div>
+                <label class="form-label" style="font-weight: 700; color: var(--primary);">
+                  <i class="fas fa-link"></i> URL de la Aplicación Web (Google Apps Script Webhook) *
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-code-branch"></i></span>
+                  <input type="url" id="cfg_gs_web_app_url" class="form-control"
+                    placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+                </div>
+                <small style="color: var(--text-muted); font-size: 11.5px; display: block; margin-top: 4px;">
+                  La URL generada al hacer clic en "Implementar como Aplicación Web" en su Google Sheet (con acceso:
+                  "Cualquier persona").
+                </small>
+              </div>
+
+              <div>
+                <label class="form-label" style="font-weight: 700; color: var(--primary);">
+                  <i class="fas fa-file-spreadsheet"></i> Enlace directo a su Hoja de Google Sheets (Opcional)
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-external-link-alt"></i></span>
+                  <input type="url" id="cfg_gs_sheet_url" class="form-control"
+                    placeholder="https://docs.google.com/spreadsheets/d/.../edit">
+                </div>
+                <small style="color: var(--text-muted); font-size: 11.5px; display: block; margin-top: 4px;">
+                  Permite abrir su archivo de Google Sheets con un solo clic desde el menú del docente y del
+                  administrador.
+                </small>
+              </div>
+            </div>
+
+            <div
+              style="background: rgba(15, 157, 88, 0.08); border: 1px solid rgba(15, 157, 88, 0.2); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+              <h4 style="font-size: 14px; font-weight: 700; color: #065f46; margin-bottom: 10px;">
+                <i class="fas fa-sliders-h"></i> Opciones de Sincronización Automática
+              </h4>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <label
+                  style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: var(--text-main);">
+                  <input type="checkbox" id="cfg_gs_auto_sync" checked
+                    style="width: 17px; height: 17px; accent-color: #0f9d58;">
+                  <span><strong>Sincronizar asistencias en vivo al escanear QR:</strong> Guarda inmediatamente en Google
+                    Sheets sin necesidad de intervención manual.</span>
+                </label>
+                <label
+                  style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: var(--text-main);">
+                  <input type="checkbox" id="cfg_gs_class_tab" checked
+                    style="width: 17px; height: 17px; accent-color: #0f9d58;">
+                  <span><strong>Organización automática multihabilidad:</strong> Registra en la pestaña General y crea
+                    pestañas individuales automáticas por Grado, Año y Sección (Ej: <em>"1° General - Sec
+                      A"</em>).</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+              <button class="btn btn-primary" onclick="sarbelioApp.saveGoogleSheetsConfigFromPanel()"
+                style="background: #0f9d58; border-color: #0b8043; font-weight: 700;">
+                <i class="fas fa-save"></i> Guardar Configuración
+              </button>
+              <button class="btn btn-secondary" onclick="sarbelioApp.testGoogleSheetsConnection()"
+                style="font-weight: 700;">
+                <i class="fas fa-bolt" style="color: #f59e0b;"></i> Probar Conexión en Vivo
+              </button>
+              <button class="btn btn-outline" onclick="sarbelioApp.syncAllAttendanceToGoogleSheets()"
+                style="font-weight: 700;">
+                <i class="fas fa-cloud-upload-alt"></i> Sincronizar Todo el Historial a Google Sheets
+              </button>
+              <button class="btn btn-outline" onclick="sarbelioApp.openGoogleSheetDirect()" style="font-weight: 700;">
+                <i class="fas fa-external-link-alt"></i> Abrir Mi Google Sheet
+              </button>
+            </div>
+
+            <!-- Contenedor de Resultado de Prueba -->
+            <div id="cfg-gs-test-result-box"
+              style="display: none; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px;"></div>
+
+            <!-- Guía de Configuración Rápida en 3 Pasos -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px;">
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <h4 style="font-size: 14px; font-weight: 800; color: var(--primary); margin: 0;">
+                  <i class="fas fa-graduation-cap"></i> ¿Cómo conectar su Google Sheet en 1 Minuto? (3 Pasos Simples)
+                </h4>
+                <button class="btn btn-sm btn-outline" onclick="sarbelioApp.copyGoogleAppsScriptCode()"
+                  style="font-size: 12px; font-weight: 700; color: #0284c7; border-color: #0284c7;">
+                  <i class="fas fa-copy"></i> Copiar Código Google Apps Script
+                </button>
+              </div>
+
+              <ol style="margin-left: 20px; font-size: 13px; color: var(--text-main); line-height: 1.8;">
+                <li>Cree una nueva hoja de cálculo vacía en <a href="https://sheets.new" target="_blank"
+                    style="color: #0284c7; font-weight: 700;">sheets.new</a> y nómbrela <strong>"Asistencias INSAVI
+                    2026"</strong>.</li>
+                <li>En el menú superior de Google Sheets, haga clic en <strong>Extensiones &gt; Apps Script</strong>.
+                  Borre el código predeterminado, pegue el código (usando el botón azul de arriba <em>"Copiar
+                    Código"</em>) y presione <strong>Guardar</strong>.</li>
+                <li>Haga clic en el botón azul superior <strong>"Implementar" &gt; "Nueva implementación"</strong>,
+                  elija tipo <strong>"Aplicación web"</strong>, configure <em>"Quién tiene acceso"</em> en
+                  <strong>"Cualquier persona" (Anyone)</strong> y haga clic en <strong>Implementar</strong>. Copie la
+                  URL generada y péguela en el campo superior.</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             FICHA INDIVIDUAL IMPRIMIBLE TAMAÑO CARTA
+             ================================================================ -->
+        <section id="view-ficha-individual" class="view-panel">
+          <div class="no-print"
+            style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn btn-secondary" id="btn-back-from-ficha"><i class="fas fa-arrow-left"></i> Volver a
+              Lista</button>
+            <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Imprimir Ficha
+              Carta</button>
+          </div>
+
+          <div class="ficha-carta-printable" id="printable-ficha-card">
+            <!-- Encabezado Institucional -->
+            <div class="ficha-header">
+              <div class="ficha-header-logo">
+                <i class="fas fa-graduation-cap" style="font-size: 40px; color: var(--primary);"></i>
+              </div>
+              <div class="ficha-header-text">
+                <h2>MINISTERIO DE EDUCACIÓN, CIENCIA Y TECNOLOGÍA</h2>
+                <h3>INSTITUTO NACIONAL DR. SARBELIO NAVARRETE</h3>
+                <h4>FICHA DE MATRÍCULA Y EXPEDIENTE DEL ESTUDIANTE</h4>
+                <p>San Vicente, El Salvador — Código de Infraestructura: 10584</p>
+              </div>
+            </div>
+
+            <!-- Datos Principales -->
+            <div class="ficha-section-title">I. DATOS PERSONALES DEL ESTUDIANTE</div>
+            <div class="ficha-grid">
+              <div class="ficha-item"><span class="label">NIE:</span> <span id="ficha_print_nie"
+                  class="val">8492015</span></div>
+              <div class="ficha-item"><span class="label">Expediente:</span> <span id="ficha_print_expediente"
+                  class="val">EXP-2026-001</span></div>
+              <div class="ficha-item" style="grid-column: span 2;"><span class="label">Nombre Completo:</span> <span
+                  id="ficha_print_nombre" class="val">Carlos Eduardo Alvarado Gomez</span></div>
+              <div class="ficha-item"><span class="label">Bachillerato:</span> <span id="ficha_print_bachillerato"
+                  class="val">ITSI</span></div>
+              <div class="ficha-item"><span class="label">Año / Sección:</span> <span id="ficha_print_grado_seccion"
+                  class="val">Primer Año - Sección A</span></div>
+              <div class="ficha-item"><span class="label">Edad:</span> <span id="ficha_print_edad" class="val">17
+                  años</span></div>
+              <div class="ficha-item"><span class="label">Sexo:</span> <span id="ficha_print_sexo"
+                  class="val">Masculino</span></div>
+              <div class="ficha-item" style="grid-column: span 2;"><span class="label">Orientador:</span> <span
+                  id="ficha_print_orientador" class="val">Prof. Carlos Hernandez</span></div>
+              <div class="ficha-item" style="grid-column: span 2;"><span class="label">Dirección:</span> <span
+                  id="ficha_print_direccion" class="val">Barrio El Calvario, Av. Crespo #14</span></div>
+            </div>
+
+            <div class="ficha-section-title">II. DATOS DEL PADRE / RESPONSABLE LEGAL</div>
+            <div class="ficha-grid">
+              <div class="ficha-item" style="grid-column: span 2;"><span class="label">Nombre del Encargado:</span>
+                <span id="ficha_print_encargado" class="val">Roberto Carlos Alvarado Perez</span>
+              </div>
+              <div class="ficha-item"><span class="label">DUI:</span> <span id="ficha_print_encargado_dui"
+                  class="val">02345678-4</span></div>
+              <div class="ficha-item"><span class="label">Teléfono:</span> <span id="ficha_print_encargado_tel"
+                  class="val">7744-1122</span></div>
+              <div class="ficha-item"><span class="label">Con quién vive:</span> <span id="ficha_print_vive"
+                  class="val">Padre y Madre</span></div>
+              <div class="ficha-item"><span class="label">¿Repite Año?:</span> <span id="ficha_print_repite"
+                  class="val">No</span></div>
+              <div class="ficha-item"><span class="label">Discapacidad:</span> <span id="ficha_print_discapacidad"
+                  class="val">Ninguna</span></div>
+              <div class="ficha-item"><span class="label">Trastorno:</span> <span id="ficha_print_trastorno"
+                  class="val">Ninguno</span></div>
+            </div>
+
+            <div class="ficha-signatures">
+              <div class="sig-box">
+                <div class="sig-line"></div>
+                <p>Firma del Padre / Responsable</p>
+              </div>
+              <div class="sig-box">
+                <div class="sig-line"></div>
+                <p>Firma y Sello del Director / Orientador</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODALES DEL SISTEMA
+       ==================================================================== -->
+
+  <!-- MODAL: REGISTRO DE CUENTA DE PADRE -->
+  <div class="modal-overlay" id="modal-padre-register">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-user-plus"></i> Registrar Cuenta de Padre de Familia</h3>
+        <button class="modal-close" onclick="sarbelioApp.closeModal('modal-padre-register')">&times;</button>
+      </div>
+      <form id="form-padre-registro">
+        <div class="filter-grid" style="grid-template-columns: 1fr 1fr;">
+          <div style="grid-column: span 2;">
+            <label class="form-label">Nombre Completo del Responsable *</label>
+            <input type="text" id="reg_padre_nombre" class="form-control" placeholder="Ej: Roberto Carlos Alvarado"
+              required>
+          </div>
+          <div>
+            <label class="form-label">DUI del Padre *</label>
+            <input type="text" id="reg_padre_dui" class="form-control" placeholder="00000000-0" required>
+          </div>
+          <div>
+            <label class="form-label">NIE del Hijo/a (Para Vincular) *</label>
+            <input type="text" id="reg_padre_nie_hijo" class="form-control" placeholder="Ej: 8492015" required>
+          </div>
+          <div>
+            <label class="form-label">Nombre de Usuario *</label>
+            <input type="text" id="reg_padre_usuario" class="form-control" placeholder="Ej: roberto.padre" required>
+          </div>
+          <div>
+            <label class="form-label">Contraseña *</label>
+            <input type="password" id="reg_padre_password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <div>
+            <label class="form-label">Teléfono *</label>
+            <input type="text" id="reg_padre_telefono" class="form-control" placeholder="7000-0000" required>
+          </div>
+          <div>
+            <label class="form-label">Correo Electrónico</label>
+            <input type="email" id="reg_padre_correo" class="form-control" placeholder="correo@padre.com">
+          </div>
+        </div>
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-secondary"
+            onclick="sarbelioApp.closeModal('modal-padre-register')">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Crear Cuenta de Responsable</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SOLICITUD DE JUSTIFICACIÓN DE INASISTENCIA (PADRE) -->
+  <div class="modal-overlay" id="modal-justificar-inasistencia">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-paper-plane"></i> Enviar Justificación de Inasistencia al Orientador</h3>
+        <button class="modal-close" onclick="sarbelioApp.closeModal('modal-justificar-inasistencia')">&times;</button>
+      </div>
+      <form id="form-enviar-justificacion">
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label class="form-label">Fecha de la Inasistencia *</label>
+          <input type="date" id="just_fecha" class="form-control" required value="2026-02-18">
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label class="form-label">Motivo Detallado de la Inasistencia *</label>
+          <textarea id="just_motivo" class="form-control" rows="4"
+            placeholder="Explique la razón de la ausencia (ej: cita médica, problema de salud, permiso familiar, etc.)"
+            required></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-secondary"
+            onclick="sarbelioApp.closeModal('modal-justificar-inasistencia')">Cancelar</button>
+          <button type="submit" class="btn btn-warning"><i class="fas fa-paper-plane"></i> Enviar Solicitud</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ANOTACIÓN EN FICHA DOCENTE / OBSERVACIÓN PSICOPEDAGÓGICA -->
+  <div class="modal-overlay" id="modal-docente-evaluar">
+    <div class="modal-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-comment-medical"></i> Registro de Observación Psicopedagógica en Ficha</h3>
+        <button class="modal-close" onclick="sarbelioApp.closeModal('modal-docente-evaluar')">&times;</button>
+      </div>
+      <form id="form-docente-evaluar">
+        <input type="hidden" id="doc_eval_student_id">
+        <div
+          style="background:var(--primary-light); padding:10px; border-radius:6px; margin-bottom:15px; font-weight:600; color:var(--primary);">
+          Estudiante: <span id="doc_eval_student_name"></span> (NIE: <span id="doc_eval_student_nie"></span>)
+        </div>
+
+        <h4
+          style="font-size:14px; margin-bottom:10px; color:var(--secondary); border-bottom:1px solid var(--border-color); padding-bottom:5px;">
+          <i class="fas fa-sticky-note"></i> Ficha Psicopedagógica y Observación de Conducta
+        </h4>
+        <div class="filter-grid" style="grid-template-columns: 1fr 1fr;">
+          <div>
+            <label class="form-label">Tipo de Registro *</label>
+            <select id="doc_obs_tipo" class="form-select" required>
+              <option value="Conducta">Conducta / Disciplina</option>
+              <option value="Académica">Académica</option>
+              <option value="Psicopedagógica">Psicopedagógica</option>
+              <option value="Excelente">Excelente / Felicitación</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Nombre del Docente / Orientador</label>
+            <input type="text" id="doc_nombre_orientador" class="form-control" value="Prof. Carlos Hernandez" readonly>
+          </div>
+          <div style="grid-column: span 2;">
+            <label class="form-label">Detalle de la Observación o Anotación *</label>
+            <textarea id="doc_obs_detalle" class="form-control" rows="4"
+              placeholder="Ingrese comentarios respecto al desempeño, conducta o aspectos psicopedagógicos del alumno..."
+              required></textarea>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-secondary"
+            onclick="sarbelioApp.closeModal('modal-docente-evaluar')">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar en Ficha del
+            Estudiante</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- MODAL: CREAR NUEVO USUARIO -->
+  <div class="modal-overlay" id="modal-crear-usuario">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-user-plus"></i> Registrar Nuevo Usuario del Sistema</h3>
+        <button class="modal-close" onclick="sarbelioApp.closeModal('modal-crear-usuario')">&times;</button>
+      </div>
+      <form id="form-crear-usuario">
+        <div class="filter-grid" style="grid-template-columns: 1fr 1fr;">
+          <div style="grid-column: span 2;">
+            <label class="form-label">Nombre Completo *</label>
+            <input type="text" id="usr_nombre" class="form-control" placeholder="Ej: Licda. Sofia Morales" required>
+          </div>
+          <div>
+            <label class="form-label">Nombre de Usuario *</label>
+            <input type="text" id="usr_usuario" class="form-control" placeholder="Ej: smorales" required>
+          </div>
+          <div>
+            <label class="form-label">Correo Electrónico *</label>
+            <input type="email" id="usr_email" class="form-control" placeholder="smorales@sarbelio.edu.sv" required>
+          </div>
+          <div>
+            <label class="form-label">Rol del Sistema *</label>
+            <select id="usr_rol" class="form-select" required>
+              <option value="Administrador">Administrador</option>
+              <option value="Personal Administrativo">Personal Administrativo</option>
+              <option value="Docente">Docente</option>
+              <option value="Padre / Responsable">Padre / Responsable</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Contraseña *</label>
+            <input type="password" id="usr_password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <div>
+            <label class="form-label">Materia / Módulo Impartido</label>
+            <select id="usr_materia" class="form-select">
+              <option value="Desarrollo de Software Web">Desarrollo de Software Web</option>
+              <option value="Mantenimiento de Computadoras">Mantenimiento de Computadoras</option>
+              <option value="Lenguaje y Literatura">Lenguaje y Literatura</option>
+              <option value="Matemáticas">Matemáticas</option>
+              <option value="Ciencias Naturales">Ciencias Naturales</option>
+              <option value="Inglés Técnico">Inglés Técnico</option>
+              <option value="Contabilidad General">Contabilidad General</option>
+              <option value="Anatomía y Salud">Anatomía y Salud</option>
+            </select>
+          </div>
+          <div style="grid-column: span 2;">
+            <label class="form-label">Años / Grados Impartidos (Asignación de Clases)</label>
+            <select id="usr_anios" class="form-select">
+              <option value="Primer Año">Primer Año (1°)</option>
+              <option value="Segundo Año">Segundo Año (2°)</option>
+              <option value="Tercer Año">Tercer Año (3°)</option>
+              <option value="Todos los Años" selected>Todos los Años (1°, 2° y 3°)</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-secondary"
+            onclick="sarbelioApp.closeModal('modal-crear-usuario')">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CREAR NUEVA CLASE PARA DOCENTE -->
+  <div class="modal-overlay" id="modal-crear-clase">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-plus-circle"></i> Crear y Asignar Nueva Clase / Materia</h3>
+        <button class="modal-close" onclick="sarbelioApp.closeModal('modal-crear-clase')">&times;</button>
+      </div>
+      <form id="form-crear-clase">
+        <div class="filter-grid" style="grid-template-columns: 1fr 1fr;">
+          <div>
+            <label class="form-label">Docente Asignado *</label>
+            <select id="cls_maestro_id" class="form-select" required>
+              <option value="1">Prof. Carlos Hernandez (DOC-2026-001)</option>
+              <option value="2">Licda. Maria Rodriguez (DOC-2026-002)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Año Académico *</label>
+            <select id="cls_anio" class="form-select" required>
+              <option value="Primer Año">Primer Año</option>
+              <option value="Segundo Año">Segundo Año</option>
+              <option value="Tercer Año">Tercer Año</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Grado / Especialidad *</label>
+            <input type="text" id="cls_grado" class="form-control" placeholder="Ej: 1° ITSI / General" required>
+          </div>
+          <div>
+            <label class="form-label">Sección *</label>
+            <select id="cls_seccion" class="form-select" required>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </div>
+          <div style="grid-column: span 2;">
+            <label class="form-label">Nombre del Módulo o Materia *</label>
+            <input type="text" id="cls_materia" class="form-control" placeholder="Ej: Desarrollo de Software Web"
+              required>
+          </div>
+          <div style="grid-column: span 2;">
+            <label class="form-label">Aula / Laboratorio Asignado</label>
+            <input type="text" id="cls_aula" class="form-control" placeholder="Ej: Laboratorio de Cómputo 1"
+              value="Aula 1">
+          </div>
+        </div>
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-secondary"
+            onclick="sarbelioApp.closeModal('modal-crear-clase')">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Clase</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR NUEVO MAESTRO -->
+  <div class="modal-overlay" id="modal-crear-maestro">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-user-plus"></i> Registrar Cuenta de Docente</h3>
+        <button class="modal-close" onclick="sarbelioApp.closeModal('modal-crear-maestro')">&times;</button>
+      </div>
+      <form id="form-crear-maestro">
+        <div class="filter-grid" style="grid-template-columns: 1fr 1fr;">
+          <div style="grid-column: span 2;">
+            <label class="form-label">Nombre Completo del Docente *</label>
+            <input type="text" id="mst_nombre" class="form-control" placeholder="Ej: Prof. Roberto Garcia" required>
+          </div>
+          <div>
+            <label class="form-label">Correo Electrónico *</label>
+            <input type="email" id="mst_email" class="form-control" placeholder="rgarcia@sarbelio.edu.sv" required>
+          </div>
+          <div>
+            <label class="form-label">Teléfono de Contacto</label>
+            <input type="text" id="mst_telefono" class="form-control" placeholder="7788-9900">
+          </div>
+          <div>
+            <label class="form-label">Nombre de Usuario *</label>
+            <input type="text" id="mst_usuario" class="form-control" placeholder="rgarcia" required>
+          </div>
+          <div>
+            <label class="form-label">Contraseña *</label>
+            <input type="password" id="mst_password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <div style="grid-column: span 2;">
+            <label class="form-label">Materia / Especialidad Impartida *</label>
+            <input type="text" id="mst_materia" class="form-control" placeholder="Ej: Desarrollo de Software Web"
+              value="Desarrollo de Software Web" required>
+          </div>
+        </div>
+
+        <div
+          style="background: #eef2ff; border: 1px solid #c7d2fe; border-left: 5px solid #4f46e5; border-radius: 10px; padding: 12px 16px; margin-top: 15px; font-size: 13px; color: #312e81;">
+          <i class="fas fa-qrcode" style="color: #4f46e5; font-size: 16px;"></i> <strong>Código QR Único por
+            Docente:</strong> Al registrar este maestro, el sistema generará automáticamente su propio <strong>Código QR
+            de Asistencia Institucional</strong> permanente para proyectarlo a sus alumnos en el aula.
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-secondary"
+            onclick="sarbelioApp.closeModal('modal-crear-maestro')">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Registrar Docente y Generar
+            QR</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CÓDIGO QR DE ASISTENCIA DEL DOCENTE (VISTA Y PROYECCIÓN) -->
+  <div class="modal-overlay" id="modal-ver-qr-docente">
+    <div class="modal-card" style="max-width: 500px; text-align: center;">
+      <div class="modal-header"
+        style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #ffffff; margin: -20px -20px 20px -20px; padding: 18px 22px; border-radius: 16px 16px 0 0;">
+        <h3 style="color: #ffffff; font-size: 18px; margin: 0; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-qrcode" style="color: #38bdf8;"></i> Código QR de Asistencia Docente
+        </h3>
+        <button class="modal-close" style="color: #ffffff;"
+          onclick="sarbelioApp.closeModal('modal-ver-qr-docente')">&times;</button>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <div
+          style="width: 54px; height: 54px; border-radius: 50%; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 10px auto;">
+          <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+        <h3 style="font-size: 20px; font-weight: 800; color: var(--secondary); margin: 0 0 4px 0;"
+          id="modal-docente-nombre">Prof. Carlos Hernandez</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin: 0;" id="modal-docente-materia">Informática y
+          Robótica</p>
+        <div style="margin-top: 6px;">
+          <span class="badge badge-primary" style="font-family: monospace; font-size: 11px;"
+            id="modal-docente-codigo">DOC-2026-001</span>
+        </div>
+      </div>
+
+      <!-- Render QR Box -->
+      <div
+        style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 18px; padding: 18px; display: inline-block; margin-bottom: 15px; max-width: 90%;">
+        <div id="modal-docente-qr-render"
+          style="width: 190px; height: 190px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: #ffffff; border-radius: 12px; padding: 6px;">
+        </div>
+        <div style="font-size: 11px; font-weight: 800; color: #1e1b4b; margin-top: 8px; letter-spacing: 0.5px;">
+          CÓDIGO QR OFICIAL DE ASISTENCIA
+        </div>
+        <div style="font-size: 10px; color: #64748b; font-family: monospace; margin-top: 2px;" id="modal-docente-token">
+          TOKEN-DOC-1234
+        </div>
+
+        <!-- ENLACE Y ID ABAJO DEL QR EN MODAL -->
+        <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed #cbd5e1;">
+          <div style="font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 4px;">
+            <i class="fas fa-key" style="color: #4f46e5;"></i> ID por si el QR no funciona:
+          </div>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px;">
+            <span id="modal-docente-token-display"
+              style="font-family: monospace; font-size: 12px; font-weight: 900; background: #e0e7ff; color: #3730a3; padding: 3px 10px; border-radius: 6px; letter-spacing: 0.5px;">
+              TOKEN-DOC-1234
+            </span>
+            <button type="button" class="btn btn-sm btn-outline" style="padding: 2px 7px; font-size: 10px;"
+              onclick="sarbelioApp.copyModalTeacherToken()" title="Copiar ID de Asistencia">
+              <i class="fas fa-copy"></i> Copiar
+            </button>
+          </div>
+          <div style="margin-top: 6px;">
+            <a id="modal-docente-qr-link" href="#" target="_blank"
+              style="font-size: 12px; font-weight: 700; color: #2563eb; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px; word-break: break-all;"
+              title="Abrir enlace directo de asistencia">
+              <i class="fas fa-external-link-alt"></i> Enlace directo abajo del QR
+            </a>
+          </div>
+          <div style="font-size: 10px; color: #64748b; margin-top: 4px; line-height: 1.3;">
+            💡 Si el QR no funciona, los alumnos pueden acceder tocando este enlace o ingresando este ID.
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.4;">
+        💡 <em>Los alumnos escanean este código con sus teléfonos móviles para quedar anotados como presentes en la
+          clase de este docente.</em>
+      </p>
+
+      <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="sarbelioApp.proyectarDesdeModal()" style="font-weight: 700;">
+          <i class="fas fa-expand"></i> 📺 Proyectar en Aula
+        </button>
+        <button class="btn btn-outline" onclick="sarbelioApp.imprimirQRModal()">
+          <i class="fas fa-print"></i> Imprimir QR
+        </button>
+        <button class="btn btn-outline" onclick="sarbelioApp.copiarEnlaceModal()">
+          <i class="fas fa-copy"></i> Copiar Enlace
+        </button>
+        <button class="btn btn-secondary" onclick="sarbelioApp.closeModal('modal-ver-qr-docente')">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AUTENTICACIÓN / LOGIN DE DOCENTE (ACCESO RESTRINGIDO) -->
+  <div class="modal-overlay" id="modal-login-maestro">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header"
+        style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #ffffff; margin: -20px -20px 20px -20px; padding: 20px; border-radius: 16px 16px 0 0;">
+        <h3 style="color: #ffffff; font-size: 18px; margin: 0; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-lock" style="color: #38bdf8;"></i> Acceso Exclusivo para Docentes
+        </h3>
+        <button class="modal-close" style="color: #ffffff;"
+          onclick="sarbelioApp.closeModal('modal-login-maestro')">&times;</button>
+      </div>
+
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+        🔒 Para ingresar a la <strong>Gestión de Maestros</strong>, <strong>Panel Docente</strong> y <strong>Proyecto de
+          Aula</strong> debe ingresar con su usuario y contraseña de maestro.
+      </p>
+
+      <form id="form-login-maestro" onsubmit="event.preventDefault(); sarbelioApp.processTeacherLogin();">
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div>
+            <label class="form-label">Usuario, Correo o Código Docente *</label>
+            <div style="position: relative;">
+              <i class="fas fa-user-tie" style="position: absolute; left: 12px; top: 12px; color: #64748b;"></i>
+              <input type="text" id="dlg-docente-user" class="form-control" style="padding-left: 38px;"
+                placeholder="Ej: chernandez o mrodriguez" required>
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label">Contraseña de Maestro *</label>
+            <div style="position: relative;">
+              <i class="fas fa-key" style="position: absolute; left: 12px; top: 12px; color: #64748b;"></i>
+              <input type="password" id="dlg-docente-pass" class="form-control" style="padding-left: 38px;"
+                placeholder="••••••••" required>
+            </div>
+          </div>
+
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px;">
+            <span style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">
+              💡 Cuentas de Maestro de prueba disponibles:
+            </span>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <button type="button" class="btn btn-outline btn-sm"
+                style="font-size: 11px; justify-content: flex-start; text-align: left;"
+                onclick="sarbelioApp.fillTeacherLogin('chernandez', '123456')">
+                <i class="fas fa-chalkboard-teacher" style="color: #6366f1;"></i> <strong>Prof. Carlos
+                  Hernandez</strong> (chernandez / 123456)
+              </button>
+              <button type="button" class="btn btn-outline btn-sm"
+                style="font-size: 11px; justify-content: flex-start; text-align: left;"
+                onclick="sarbelioApp.fillTeacherLogin('mrodriguez', '123456')">
+                <i class="fas fa-user-graduate" style="color: #3b82f6;"></i> <strong>Licda. Maria Rodriguez</strong>
+                (mrodriguez / 123456)
+              </button>
+              <button type="button" class="btn btn-outline btn-sm"
+                style="font-size: 11px; justify-content: flex-start; text-align: left;"
+                onclick="sarbelioApp.fillTeacherLogin('admin', 'admin123')">
+                <i class="fas fa-shield-alt" style="color: #10b981;"></i> <strong>Admin Maestro</strong> (admin /
+                admin123)
+              </button>
+            </div>
+          </div>
+
+          <div id="dlg-docente-error"
+            style="display: none; color: #ef4444; font-size: 13px; font-weight: 600; text-align: center; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 8px;">
+          </div>
+        </div>
+
+        <div style="margin-top: 22px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-secondary"
+            onclick="sarbelioApp.closeModal('modal-login-maestro')">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="font-weight: 700;">
+            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión como Maestro
+          </button>
+        </div>
+      </form>
+    </div>
+    <!-- MODAL: ESCÁNER DE CREDENCIAL DE ALUMNO PARA MAESTRO (CÁMARA REAL) -->
+    <div class="modal-overlay" id="modal-docente-scanner">
+      <div class="modal-card" style="max-width: 520px; text-align: center;">
+        <div class="modal-header">
+          <h3><i class="fas fa-camera" style="color: var(--primary);"></i> Escaneo de Carnet / Credencial por Cámara
+          </h3>
+          <button class="modal-close"
+            onclick="sarbelioApp.closeModal('modal-docente-scanner'); sarbelioApp.stopDocenteCameraScanner();">&times;</button>
+        </div>
+
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
+          Coloque la credencial del estudiante frente a la cámara de su computadora o tablet.
+        </p>
+
+        <div id="teacher-camera-reader"
+          style="width: 100%; min-height: 250px; background: #000; border-radius: 14px; overflow: hidden; margin-bottom: 15px; border: 2px solid var(--primary);">
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 10px;">
+          <button class="btn btn-secondary"
+            onclick="sarbelioApp.closeModal('modal-docente-scanner'); sarbelioApp.stopDocenteCameraScanner();">
+            Cerrar Escáner
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: CONEXIÓN Y CONFIGURACIÓN DE GOOGLE SHEETS -->
+    <div class="modal-overlay" id="modal-google-sheets">
+      <div class="modal-card" style="max-width: 680px;">
+        <div class="modal-header">
+          <h3 style="display: flex; align-items: center; gap: 8px; color: #0f9d58;">
+            <i class="fas fa-table" style="font-size: 22px;"></i> Conexión con Google Sheets para Asistencia QR
+          </h3>
+          <button class="modal-close" onclick="sarbelioApp.closeModal('modal-google-sheets')">&times;</button>
+        </div>
+
+        <div
+          style="margin-bottom: 16px; padding: 12px; background: rgba(15, 157, 88, 0.08); border-radius: 8px; border: 1px solid rgba(15, 157, 88, 0.2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <span style="font-size: 13px; color: var(--text-main);">
+            Estado actual: <strong id="modal-gs-status-text">⚪ Sin Configurar</strong>
+          </span>
+          <button class="btn btn-sm btn-outline" onclick="sarbelioApp.copyGoogleAppsScriptCode()"
+            style="font-size: 11px; font-weight: 700; color: #0284c7; border-color: #0284c7;">
+            <i class="fas fa-copy"></i> Copiar Código Apps Script
+          </button>
+        </div>
+
+        <form id="form-google-sheets-modal"
+          onsubmit="event.preventDefault(); sarbelioApp.saveGoogleSheetsConfigFromModal();">
+          <div style="margin-bottom: 15px;">
+            <label class="form-label" style="font-weight: 700; color: var(--primary);">
+              URL de la Aplicación Web de Google Apps Script *
+            </label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-link"></i></span>
+              <input type="text" id="modal_gs_web_app_url" class="form-control"
+                placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+            </div>
+            <small style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">
+              Obtenida en Google Sheets &gt; Extensiones &gt; Apps Script &gt; Implementar &gt; Aplicación Web.
+            </small>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label class="form-label" style="font-weight: 700; color: var(--primary);">
+              Enlace de su Hoja de Cálculo Google Sheets (Opcional)
+            </label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-file-spreadsheet"></i></span>
+              <input type="text" id="modal_gs_sheet_url" class="form-control"
+                placeholder="https://docs.google.com/spreadsheets/d/.../edit">
+            </div>
+          </div>
+
+          <div
+            style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
+            <label
+              style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; margin-bottom: 6px;">
+              <input type="checkbox" id="modal_gs_auto_sync" checked
+                style="width: 16px; height: 16px; accent-color: #0f9d58;">
+              <span><strong>Sincronizar automáticamente en cada marcaje QR</strong> (Día, Grado, Sección, Año y
+                Maestro)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer;">
+              <input type="checkbox" id="modal_gs_class_tab" checked
+                style="width: 16px; height: 16px; accent-color: #0f9d58;">
+              <span>Crear pestañas automáticas organizadas por Grado y Sección (Ej: <em>"1° General - Sec
+                  A"</em>)</span>
+            </label>
+          </div>
+
+          <!-- Indicador de Prueba -->
+          <div id="modal-gs-test-result-box"
+            style="display: none; padding: 12px; border-radius: 8px; font-size: 12.5px; margin-bottom: 15px;"></div>
+
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 20px;">
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="sarbelioApp.testGoogleSheetsConnection()">
+                <i class="fas fa-bolt" style="color: #f59e0b;"></i> Probar Conexión
+              </button>
+              <button type="button" class="btn btn-outline btn-sm"
+                onclick="sarbelioApp.syncAllAttendanceToGoogleSheets()">
+                <i class="fas fa-cloud-upload-alt"></i> Subir Todo el Historial
+              </button>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-secondary btn-sm"
+                onclick="sarbelioApp.closeModal('modal-google-sheets')">Cerrar</button>
+              <button type="button" class="btn btn-success btn-sm" id="btn-save-modal-gsheets"
+                onclick="sarbelioApp.saveGoogleSheetsConfigFromModal()"
+                style="font-weight: 700; background: #0f9d58; border-color: #0b8043; cursor: pointer;">
+                <i class="fas fa-save"></i> Guardar y Conectar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scripts JavaScript -->
+    <script src="js/reports.js"></script>
+    <script src="js/wizard.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
